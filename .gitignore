@@ -18,4 +18,4 @@ CMakeLists.txt
 .idea/
 target
 target/*
-spl211.iml
+*.iml
