@@ -6,15 +6,33 @@ public class Student {
     private Vector<Integer> registeredCourses;
 
     public Student (String userName_, String password_){
+        userName = userName_;
+        password = password_;
+        registeredCourses = new Vector<>();
     }
 
     //getters
+    public String getStudentUserName(){
+        return userName;
+    }
+    public String getStudentPassword(){
+        return password;
+    }
+    public Vector<Integer> getRegisteredCourses(){
+        return registeredCourses;
+    }
 
     //boolean register(int)
-       //add course to registeredCourses.
+    public void register2Course(int courseID){
+        if(!registeredCourses.contains(courseID)){
+            registeredCourses.add(courseID);
+        }
+    }
 
     //boolean unRegister
-        //remove course from registeredCourses
-
-
+    public void unregisterCourse(int courseID){
+        if(registeredCourses.contains(courseID)) {
+            registeredCourses.remove(courseID);
+        }
+    }
 }

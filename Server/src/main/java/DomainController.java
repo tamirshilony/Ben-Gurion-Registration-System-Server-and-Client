@@ -8,7 +8,7 @@ public class DomainController {
 
     //check if register
 
-    //handle user (opCode, userName, password)
+    //handle user (msg)
         //resolve opCode
         //check if register
         //check if logged
