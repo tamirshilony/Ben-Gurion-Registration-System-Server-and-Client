@@ -41,7 +41,7 @@ public class Database {
 		try (Scanner scanner = new Scanner(new File(coursesFilePath))) {
 			while (scanner.hasNext()) {
 				String courseInfo = scanner.nextLine();
-				String[] info = courseInfo.split("|");
+				String[] info = courseInfo.split("\\|");
 				int courseId =Integer.parseInt(info[0]);
 				String courseName = info[1];
 				int limit = Integer.parseInt(info[3]);
