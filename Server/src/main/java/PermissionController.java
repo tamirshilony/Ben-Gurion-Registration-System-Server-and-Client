@@ -10,7 +10,7 @@ public class PermissionController {
     public PermissionController(){
     }
 
-    private Message registerUser( PermissionMessage msg){
+    private Message registerUser(PermissionMessage msg){
         OpcodeType opcodeType = msg.getType();
         // check register condition and update field
         if(db.register(msg.getUserName(),msg.getPassword())!= null){
@@ -19,7 +19,7 @@ public class PermissionController {
             if(opcodeType == OpcodeType.ADMINREG)
                 isAdmin =true;
             //ack
-            return messageFactory.createMessage(OpcodeType.ACK,opcodeType,"REGISTERED\0");
+            return messageFactory.createMessage(OpcodeType.ACK,opcodeType);
         }
         else {
             // error
@@ -64,8 +64,12 @@ public class PermissionController {
                 //error
                 return messageFactory.createMessage(OpcodeType.ERR, opcodeType);
         }
+        else if (opcodeType == OpcodeType.LOGOUT) {
+            isLoggedin = false;
+            return messageFactory.createMessage(OpcodeType.ACK, opcodeType);
+        }
         // check admin credentials
-        else if(!isAdmin & (opcodeType == OpcodeType.COURSESTAT || opcodeType ==OpcodeType.STUDENTSTAT))
+        else if(!isAdmin & (opcodeType == OpcodeType.COURSESTAT || opcodeType == OpcodeType.STUDENTSTAT))
             // error
             return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
         else

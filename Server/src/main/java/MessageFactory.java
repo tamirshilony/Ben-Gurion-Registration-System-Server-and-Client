@@ -17,6 +17,9 @@ public class MessageFactory {
         return new CourseMessage(type,courseNum);
     }
 
+    public Message createMessage(OpcodeType type,String userName){return new UserMessage(type,userName);
+    }
+
     //Ack/Err creator
     public Message createMessage(OpcodeType type, OpcodeType sourceType){
         if (type == OpcodeType.ERR){
