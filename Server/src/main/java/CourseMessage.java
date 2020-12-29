@@ -7,4 +7,7 @@ public class CourseMessage extends Message{
         courseNum = courseNum_;
     }
 
+    public int getCourseNum() {
+        return courseNum;
+    }
 }

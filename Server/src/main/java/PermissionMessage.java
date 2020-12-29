@@ -8,4 +8,12 @@ public class PermissionMessage extends Message{
         userName = userName_;
         password = password_;
     }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
 }
