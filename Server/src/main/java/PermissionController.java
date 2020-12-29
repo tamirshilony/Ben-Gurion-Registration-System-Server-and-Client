@@ -2,8 +2,8 @@ import java.util.Vector;
 
 public class PermissionController {
     private Database db;
-    private boolean isAdmin;
     private boolean isRegistered;
+    private boolean isgitAdmin;
     private boolean isLoggedin;
 
 
