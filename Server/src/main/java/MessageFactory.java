@@ -21,7 +21,7 @@ public class MessageFactory {
         else
             return new Ack(sourceType);
     }
-    public Message createMessage(OpcodeType sourceOp,String response){
+    public Message createMessage(OpcodeType type, OpcodeType sourceOp,String response){
         return new Ack(sourceOp,response);
     }
 
