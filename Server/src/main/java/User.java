@@ -1,21 +1,21 @@
 import java.util.Vector;
 
-public class Student {
+public class User {
     private String userName;
     private String password;
     private Vector<Integer> registeredCourses;
 
-    public Student (String userName_, String password_){
+    public User (String userName_, String password_){
         userName = userName_;
         password = password_;
         registeredCourses = new Vector<>();
     }
 
     //getters
-    public String getStudentUserName(){
+    public String getUserUserName(){
         return userName;
     }
-    public String getStudentPassword(){
+    public String getUserPassword(){
         return password;
     }
     public Vector<Integer> getRegisteredCourses(){

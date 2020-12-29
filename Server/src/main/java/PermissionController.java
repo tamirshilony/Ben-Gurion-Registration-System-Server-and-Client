@@ -1,44 +1,86 @@
 import java.util.Vector;
 
 public class PermissionController {
-    private Database db;
-    private boolean isAdmin;
-    private boolean isRegistered;
-    private boolean isLoggedin;
+    private Database db = Database.getInstance();
+    private MessageFactory messageFactory = new MessageFactory();
+    private boolean isAdmin = false;
+    private boolean isRegistered = false;
+    private boolean isLoggedin = false;
+
+    public PermissionController(){
+    }
+
+    private Message registerUser( PermissionMessage msg){
+        OpcodeType opcodeType = msg.getType();
+        // check register condition and update field
+        if(db.register(msg.getUserName(),msg.getPassword())!= null){
+            isRegistered = true;
+            //checking if admin request and update field
+            if(opcodeType == OpcodeType.ADMINREG)
+                isAdmin =true;
+            //ack
+            return messageFactory.createMessage(OpcodeType.ACK,opcodeType,"REGISTERED\0");
+        }
+        else {
+            // error
+            return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+        }
+    }
 
 
-    //message registerUser(opCode)
-        //if db.reg(user)
-            //change isReg
-            //if(op == regAd){isAdmin = true}
-            //return MF.createmsg(Acc,regg)
-        //else
-            //return MF.createmsg(ERR,regg)
+    private Message login(PermissionMessage msg){
+        OpcodeType opcodeType = msg.getType();
+        // get user from dataBase if exist
+        User user =db.getUser(msg.getUserName());
+        // check valid login condition
+        if(user != null && msg.getPassword() == user.getUserPassword()){
+            //update field
+            isLoggedin = true;
+            //ack
+            return messageFactory.createMessage(opcodeType,opcodeType);
+        }
+        else {
+            // error
+            return  messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+        }
 
-    //message login()
-        //User user = db.getUser(msg.username)
-        //if(user!= null && msg.pass == user.pass)
-            //change status to loggin
-            //return ack
-        //else
-            //return err
+    }
 
-
-
-    //handleMessage
+    public Message handleMessage(Message msg){
         //get OpcodeType
-        //if not register
-            //if opcode = register
-                //ret registerUser(op)
-            //else
-                //ret err
-        //else if not logged
-            //if opcode =loggin
-                //ret loggin(user)
-            //else
-                //ret err
-        //else if (!isAdmin & (op = curseStat || studentStat))
-            //ret err
-        //ret null
+        OpcodeType opcodeType = msg.getType();
+        //check if not register
+        if(!isRegistered){
+            if(opcodeType == OpcodeType.STUDENTREG)
+                return registerUser((PermissionMessage)msg);
+            else
+                return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+        }
+        //check if not login
+        else if (!isLoggedin) {
+            if (opcodeType == OpcodeType.LOGIN)
+                return login((PermissionMessage) msg);
+            else
+                //error
+                return messageFactory.createMessage(OpcodeType.ERR, opcodeType);
+        }
+        // check admin credentials
+        else if(!isAdmin & (opcodeType == OpcodeType.COURSESTAT || opcodeType ==OpcodeType.STUDENTSTAT))
+            // error
+            return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+        else
+            return null;
+        }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public boolean isLoggedin() {
+        return isLoggedin;
+    }
+
+    public boolean isRegistered() {
+        return isRegistered;
+    }
 }
