@@ -7,7 +7,8 @@ public class BGURSProtocol implements MessagingProtocol {
     public Object process(Object msg) {
         //pass msg to controller and get message
         //if msg ok
-            //pass msg to regController
+            //get username
+            //pass msg to regController with username
         return msg;
     }
 

@@ -43,19 +43,20 @@ public class Course {
     }
 
     public boolean registerUser(User User){
-        boolean ans = true;
         if(numOfRegistered == limit)
             return false;
         synchronized (registerUsers) {
             registerUsers.add(User);
             numOfRegistered++;
         }
-        return ans;
+        return true;
     }
-    public synchronized void unregister(User User){
+    public boolean unregister(User User){
         synchronized (registerUsers){
-            registerUsers.remove(User);
-            numOfRegistered--;
+            boolean succeed = registerUsers.remove(User);
+            if(succeed)
+                numOfRegistered--;
+            return succeed;
         }
     }
 

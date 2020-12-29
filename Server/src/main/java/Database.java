@@ -68,11 +68,11 @@ public class Database {
 	}
 
 	public User getUser(String userName){
-		if(userName2User.containsKey(userName))
-			return userName2User.get(userName);
-		return null;
-
+		return userName2User.get(userName);
 	}
-	//
+
+	public Course getCourse(int courseNum){
+		return courseID2Course.get(courseNum);
+	}
 
 }

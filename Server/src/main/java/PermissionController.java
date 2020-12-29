@@ -3,78 +3,71 @@ import java.util.Vector;
 public class PermissionController {
     private Database db = Database.getInstance();
     private MessageFactory messageFactory = new MessageFactory();
-    private boolean isAdmin = false;
     private boolean isRegistered = false;
+    private String userName;
+    private boolean isAdmin = false;
     private boolean isLoggedin = false;
 
     public PermissionController(){
     }
 
     private Message registerUser(PermissionMessage msg){
-        OpcodeType opcodeType = msg.getType();
+        OpcodeType type = msg.getType();
         // check register condition and update field
         if(db.register(msg.getUserName(),msg.getPassword())!= null){
             isRegistered = true;
             //checking if admin request and update field
-            if(opcodeType == OpcodeType.ADMINREG)
+            if(type == OpcodeType.ADMINREG)
                 isAdmin =true;
-            //ack
-            return messageFactory.createMessage(OpcodeType.ACK,opcodeType);
+            userName = msg.getUserName();
+            return messageFactory.createMessage(OpcodeType.ACK,type);
         }
         else {
-            // error
-            return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+            return messageFactory.createMessage(OpcodeType.ERR,type);
         }
     }
 
 
     private Message login(PermissionMessage msg){
-        OpcodeType opcodeType = msg.getType();
+        OpcodeType type = msg.getType();
         // get user from dataBase if exist
         User user =db.getUser(msg.getUserName());
         // check valid login condition
         if(user != null && msg.getPassword() == user.getUserPassword()){
             //update field
             isLoggedin = true;
-            //ack
-            return messageFactory.createMessage(opcodeType,opcodeType);
+            return messageFactory.createMessage(type,type);
         }
         else {
-            // error
-            return  messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+            return  messageFactory.createMessage(OpcodeType.ERR,type);
         }
-
     }
 
     public Message handleMessage(Message msg){
-        //get OpcodeType
-        OpcodeType opcodeType = msg.getType();
-        //check if not register
+        OpcodeType type = msg.getType();
         if(!isRegistered){
-            if(opcodeType == OpcodeType.STUDENTREG)
+            if(type == OpcodeType.STUDENTREG)
                 return registerUser((PermissionMessage)msg);
             else
-                return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+                return messageFactory.createMessage(OpcodeType.ERR,type);
         }
-        //check if not login
         else if (!isLoggedin) {
-            if (opcodeType == OpcodeType.LOGIN)
+            if (type == OpcodeType.LOGIN)
                 return login((PermissionMessage) msg);
             else
-                //error
-                return messageFactory.createMessage(OpcodeType.ERR, opcodeType);
+                return messageFactory.createMessage(OpcodeType.ERR, type);
         }
-        else if (opcodeType == OpcodeType.LOGOUT) {
+        else if (type == OpcodeType.LOGOUT) {
             isLoggedin = false;
-            return messageFactory.createMessage(OpcodeType.ACK, opcodeType);
+            return messageFactory.createMessage(OpcodeType.ACK, type);
         }
         // check admin credentials
-        else if(!isAdmin & (opcodeType == OpcodeType.COURSESTAT || opcodeType == OpcodeType.STUDENTSTAT))
-            // error
-            return messageFactory.createMessage(OpcodeType.ERR,opcodeType);
+        else if(!isAdmin & (type == OpcodeType.COURSESTAT || type == OpcodeType.STUDENTSTAT)
+                                                    || (isAdmin & type == OpcodeType.COURSEREG))
+            return messageFactory.createMessage(OpcodeType.ERR,type);
         else
             return null;
-        }
+    }
 
     public boolean isAdmin() {
         return isAdmin;
@@ -86,5 +79,8 @@ public class PermissionController {
 
     public boolean isRegistered() {
         return isRegistered;
+    }
+    public String getUserName() {
+        return userName;
     }
 }

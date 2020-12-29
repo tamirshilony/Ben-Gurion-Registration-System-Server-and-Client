@@ -30,7 +30,7 @@ public class MessageFactory {
     }
     //Ack with optional string creator
     public Message createMessage(OpcodeType type, OpcodeType sourceOp,String response){
-        //OpcodeType type for uniformity with acc/err creator
+        //OpcodeType type only for uniformity with acc/err creator
         return new Ack(sourceOp,response);
     }
 
