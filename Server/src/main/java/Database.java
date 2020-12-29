@@ -17,13 +17,13 @@ public class Database {
 		private static Database instance = new Database();
 	}
 	private ConcurrentHashMap<Integer,Course>courseID2Course;
-	private ConcurrentHashMap<String,Student>userName2Student;
+	private ConcurrentHashMap<String,User>userName2User;
 
 	//to prevent user from creating new Database
 
 	private Database() {
 		courseID2Course = new ConcurrentHashMap<>();
-		userName2Student = new ConcurrentHashMap<>();
+		userName2User = new ConcurrentHashMap<>();
 	}
 
 	/**
@@ -63,6 +63,15 @@ public class Database {
 		return courseID2Course;
 	}
 
+	public User register(String userName,String password){
+		return userName2User.putIfAbsent(userName,new User(userName,password));
+	}
 
+	public User getUser(String userName){
+		if(userName2User.containsKey(userName))
+			return userName2User.get(userName);
+		return null;
+
+	}
 
 }

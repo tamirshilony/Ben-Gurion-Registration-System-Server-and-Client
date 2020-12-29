@@ -8,7 +8,7 @@ public class Course {
     private final String courseName;
     private final Vector<Integer> kdams;
     private final int limit;
-    private CopyOnWriteArrayList<Student> registerStudents;
+    private CopyOnWriteArrayList<User> registerUsers;
     private int numOfRegistered;
 
     public Course(int courseNum_, String courseName_,
@@ -17,7 +17,7 @@ public class Course {
         courseName = courseName_;
         kdams = kdams_;
         limit = limit_;
-        registerStudents = new CopyOnWriteArrayList<Student>();
+        registerUsers = new CopyOnWriteArrayList<User>();
         numOfRegistered = 0;
     }
     //getters
@@ -42,24 +42,24 @@ public class Course {
         return numOfRegistered;
     }
 
-    public boolean registerStudent(Student student){
+    public boolean registerUser(User User){
         boolean ans = true;
         if(numOfRegistered == limit)
             return false;
-        synchronized (registerStudents) {
-            registerStudents.add(student);
+        synchronized (registerUsers) {
+            registerUsers.add(User);
             numOfRegistered++;
         }
         return ans;
     }
-    public synchronized void unregister(Student student){
-        synchronized (registerStudents){
-            registerStudents.remove(student);
+    public synchronized void unregister(User User){
+        synchronized (registerUsers){
+            registerUsers.remove(User);
             numOfRegistered--;
         }
     }
 
-    public CopyOnWriteArrayList<Student> getRegisterStudents() {
-        return registerStudents;
+    public CopyOnWriteArrayList<User> getRegisterUsers() {
+        return registerUsers;
     }
 }
