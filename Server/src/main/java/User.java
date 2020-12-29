@@ -35,4 +35,5 @@ public class User {
             registeredCourses.remove(courseID);
         }
     }
+
 }
