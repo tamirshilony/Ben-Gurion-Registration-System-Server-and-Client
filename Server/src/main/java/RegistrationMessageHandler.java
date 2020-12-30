@@ -3,13 +3,14 @@ import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RegistrationController {
+public class RegistrationMessageHandler {
     private Database db;
     private MessageFactory messageFactory;
 
-    public RegistrationController(){}
+    public RegistrationMessageHandler(){}
     //handle msg(msg)
-    public Message handleMessage(Message msg, String userName){
+    public Message handleMessage(Message msg){
+        String userName = msg.getUserName();
         OpcodeType type = msg.getType();
         String optional = "";
         boolean succeed;
@@ -23,7 +24,7 @@ public class RegistrationController {
             case MYCOURSES:
                 return studentCourses((OpCodeMessage)msg, userName);
             case STUDENTSTAT:
-                return studentStat((UserMessage)msg);
+                return studentStat((OpCodeMessage)msg);
             case COURSESTAT:
                 return courseStat((CourseMessage)msg);
             case ISREGISTERED:
@@ -108,7 +109,7 @@ public class RegistrationController {
         return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courseNum_Name + "\n" + seatsAvailable + "\n" + registerUserName);
     }
 
-    private Message studentStat(UserMessage msg){
+    private Message studentStat(OpCodeMessage msg){
         // get user name
         String name = msg.getUserName();
         //string for response

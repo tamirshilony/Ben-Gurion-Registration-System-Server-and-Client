@@ -1,6 +1,6 @@
 import java.util.Vector;
 
-public class PermissionController {
+public class PermissionMessageHandler extends MessageHandler {
     private Database db = Database.getInstance();
     private MessageFactory messageFactory = new MessageFactory();
     private boolean isRegistered = false;
@@ -8,7 +8,7 @@ public class PermissionController {
     private boolean isAdmin = false;
     private boolean isLoggedin = false;
 
-    public PermissionController(){
+    public PermissionMessageHandler(){
     }
 
     private Message registerUser(PermissionMessage msg){
@@ -16,10 +16,10 @@ public class PermissionController {
         // check register condition and update field
         if(db.register(msg.getUserName(),msg.getPassword())!= null){
             isRegistered = true;
+            userName = msg.getUserName();
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
                 isAdmin =true;
-            userName = msg.getUserName();
             return messageFactory.createMessage(OpcodeType.ACK,type);
         }
         else {
@@ -66,7 +66,8 @@ public class PermissionController {
                                                     || (isAdmin & type == OpcodeType.COURSEREG))
             return messageFactory.createMessage(OpcodeType.ERR,type);
         else
-            return null;
+            msg.setUserName(userName);
+            return msg;
     }
 
     public boolean isAdmin() {
