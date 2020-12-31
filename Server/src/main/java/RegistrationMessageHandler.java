@@ -1,4 +1,3 @@
-import javax.jws.soap.SOAPBinding;
 import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
