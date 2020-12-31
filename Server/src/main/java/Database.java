@@ -71,7 +71,8 @@ public class Database {
 		return userName2User.get(userName);
 	}
 
-	public Course getCourse(int courseNum){
+	public Course
+	getCourse(int courseNum){
 		return courseID2Course.get(courseNum);
 	}
 

@@ -4,4 +4,8 @@ public class Error extends Message {
         super(OpcodeType.ERR);
         this.sourceMsgType = sourceMsgType;
     }
+
+    public OpcodeType getSourceMsgType() {
+        return sourceMsgType;
+    }
 }
