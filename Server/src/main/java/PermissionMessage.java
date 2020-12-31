@@ -12,5 +12,7 @@ public class PermissionMessage extends Message{
         return password;
     }
 
-
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

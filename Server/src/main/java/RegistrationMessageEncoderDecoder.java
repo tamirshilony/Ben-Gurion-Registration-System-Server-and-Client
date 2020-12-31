@@ -1,85 +1,118 @@
-import sun.security.util.ArrayUtil;
 
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Vector;
 
 public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<Message>{
     MessageFactory messageFactory = new MessageFactory();
     ByteBuffer byteBuffer = ByteBuffer.allocate(2);
-    ByteBuffer stringBuffer = ByteBuffer.allocate(4);
+    ByteArrayOutputStream stringBuffer = new ByteArrayOutputStream(4);
     OpcodeType type = null;
-    Message decodedMsg = null;
-
+    PermissionMessage decodedPermissionMsg = null;
+    CourseMessage decodedCourseMsg = null;
 
     @Override
     public Message decodeNextByte(byte nextByte) {
         //if opcode is null
+        if(type == null){
+            decodedPermissionMsg = null;
+            decodedCourseMsg = null;
             //put next byte in buffer
+            byteBuffer.put(nextByte);
             //if buffer not full return null
-            //if full
+            if(byteBuffer.hasRemaining())
+                return null;
+            else { // buffer full
                 //resolve opcode and update field
+                byte[]opcodeByte = byteBuffer.array();
+                short opcode = bytesToShort(opcodeByte);
+                type = OpcodeType.values()[opcode];
                 //clear buffer
-                //return null
-        //switch(type)
-//        case opcode: type decodedmsg is new opcode msg
-        //case(all types of permission messages)
-//        permissionMessageDecodmsger(nextByte)
-//      case(al types of course messages)
-//        courseMessageDecoder(nextByte)
+                byteBuffer.clear();
+                return null;
+            }
+        }
+        switch (type){
+            case MYCOURSES: case LOGOUT: case STUDENTSTAT:
+                return messageFactory.createMessage(type);
+            //case(all types of permission messages)
+            case LOGIN: case ADMINREG: case STUDENTREG:
+                return permissionMessageDecoder(nextByte);
+            //case(al types of course messages)
+            case COURSEREG: case COURSESTAT: case KDAMCHECK: case UNREGISTER: case ISREGISTERED:
+                return courseMessageDecoder(nextByte);
+        }
 
         return null;
     }
     private Message permissionMessageDecoder(byte nextByte) {
-        //if decMsg == nul
-        //init permission msg
-        //else
-            //if (!nextByte == 0) {
-                //put byte in stringbuffer
-            //else
-                //put 0 byte in buffer
-//              if buffer full
-//                put string in password
-//                clear buffer
-//                return msg
-//              else
-//                put user name in message
+        //if we didn't start decode the message
+        if(decodedPermissionMsg == null) {
+            //init permission msg
+            decodedPermissionMsg = messageFactory.createMessage(type, "", "");
+        }
+        //if next byte still part of the message protocol
+        if(nextByte != 0) {
+            //put byte in stringbuffer
+            stringBuffer.write(nextByte);
+        }
+        else {
+            //put 0 byteif(decodedMsg == null) { in buffer to know we end a parameter
+            byteBuffer.put((byte) 0);
+            //check witch parameter it is
+            if (!byteBuffer.hasRemaining()) {
+                // create the parameter and update
+                String pasword = new String(stringBuffer.toByteArray(), StandardCharsets.UTF_8);
+                decodedPermissionMsg.setPassword(pasword);
+                byteBuffer.clear();
+                return decodedPermissionMsg;
+            }
+            // create the parameter and update
+            String username = new String(stringBuffer.toByteArray(),StandardCharsets.UTF_8);
+            decodedPermissionMsg.setUserName(username);
+        }
         return null;
     }
     private Message courseMessageDecoder(byte nextByte) {
-//        if decMsg == nul
-//              init course msg
-//        else
-//            put next byte in buffer
-//            if buffer full
-//                resolve course number put in message and return message
-//                clear buffer
+        //if we didn't start decode the message
+        if(decodedCourseMsg == null) {
+            //init course msg
+            decodedCourseMsg = messageFactory.createMessage(type,-1);
+        }
+//        else put next byte in buffer
+        byteBuffer.put(nextByte);
+        if (!byteBuffer.hasRemaining()){
+            // resolve course number put in message and return message
+            int courseNum = bytesToShort(byteBuffer.array());
+            decodedCourseMsg.setCourseNum(courseNum);
+            byteBuffer.clear();
+            return decodedCourseMsg;
+        }
         return null;
     }
 
 
-    @Override
     public byte[] encode(Message message) {
-        OpcodeType type = message.getType();
-        byte[] opByte = shortToBytes((short)type.ordinal());
-        byte[] sourceOpcode = new byte[0];
-        switch (type){
-            case ACK:
-                sourceOpcode = encodeAck((Ack)message);
-            case ERR:
-                sourceOpcode = encodeErr((Error)message);
+        ResponseMessage msg = (ResponseMessage)message;
+        OpcodeType type = msg.getType();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4);
+        try {
+            out.write(shortToBytes((short)type.ordinal()));
+            out.write(shortToBytes((short)msg.getSourceMsgType().ordinal()));
+            if(type == OpcodeType.ACK) {
+                out.write(msg.getOptionalData().getBytes(StandardCharsets.UTF_8));
+                out.write((byte) 0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        byte[] encodedResponse = new byte[opByte.length+sourceOpcode.length];
-        System.arraycopy(opByte, 0, encodedResponse,0, opByte.length);
-        System.arraycopy(sourceOpcode, 0, encodedResponse,opByte.length, sourceOpcode.length);
-
-        return encodedResponse;
+        return out.toByteArray();
     }
 
-    private byte[] encodeAck(Ack ack){}
-    //transform source and optional to bytes add 0 byte
-    private byte[] encodeErr(Error err){}
-    //transform source bytes
 
     private static byte[] shortToBytes ( short num)
     {
