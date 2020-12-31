@@ -19,6 +19,10 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
                 //return null
         //switch(type)
 //        case opcode: type decodedmsg is new opcode msg
+        //case(all types of permission messages)
+//        permissionMessageDecoder(nextByte)
+//      case(al types of course messages)
+//        courseMessageDecoder(nextByte)
 
         return null;
     }
