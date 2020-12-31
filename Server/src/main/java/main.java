@@ -1,4 +1,5 @@
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,9 +31,11 @@ public class main {
 //        short i = 5;
 //        byte [] ar = shortToBytes(i);
 //        System.out.println(ar.getClass());
-        System.out.println("".getBytes(StandardCharsets.UTF_8));
-        byte[] b = "".getBytes(StandardCharsets.UTF_8);
-        System.out.println(b.length);
+//        System.out.println("".getBytes(StandardCharsets.UTF_8));
+//        byte[] b = "".getBytes(StandardCharsets.UTF_8);
+//        System.out.println(b.length);
+        OpcodeType type = OpcodeType.values()[1];
+
     }
     public static byte[] shortToBytes ( short num)
     {

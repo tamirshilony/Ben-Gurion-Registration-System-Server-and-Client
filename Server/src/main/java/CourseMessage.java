@@ -8,4 +8,8 @@ public class CourseMessage extends Message{
     }
 
     public int getCourseNum() {return courseNum;}
+
+    public void setCourseNum(int courseNum) {
+        this.courseNum = courseNum;
+    }
 }

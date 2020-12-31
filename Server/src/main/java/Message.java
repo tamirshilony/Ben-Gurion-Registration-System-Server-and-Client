@@ -19,4 +19,5 @@ public abstract class  Message {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
 }

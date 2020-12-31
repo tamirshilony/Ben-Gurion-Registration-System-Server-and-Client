@@ -1,13 +1,15 @@
-import sun.security.util.ArrayUtil;
 
+
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Vector;
 
 public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<Message>{
     MessageFactory messageFactory = new MessageFactory();
     ByteBuffer byteBuffer = ByteBuffer.allocate(2);
-    ByteBuffer stringBuffer = ByteBuffer.allocate(4);
+    ByteArrayOutputStream stringBuffer = new ByteArrayOutputStream(4);
     OpcodeType type = null;
     Message decodedMsg = null;
 
@@ -15,46 +17,79 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
     @Override
     public Message decodeNextByte(byte nextByte) {
         //if opcode is null
+        if(type == null){
             //put next byte in buffer
+            byteBuffer.put(nextByte);
             //if buffer not full return null
-            //if full
+            if(byteBuffer.hasRemaining())
+                return null;
+            else { // buffer full
                 //resolve opcode and update field
+                byte[]opcodeByte = byteBuffer.array();
+                short opcode = bytesToShort(opcodeByte);
+                type = OpcodeType.values()[opcode];
                 //clear buffer
-                //return null
-        //switch(type)
-//        case opcode: type decodedmsg is new opcode msg
-        //case(all types of permission messages)
-//        permissionMessageDecoder(nextByte)
-//      case(al types of course messages)
-//        courseMessageDecoder(nextByte)
+                byteBuffer.clear();
+                return null;
+            }
+        }
+        switch (type){
+            case MYCOURSES: case LOGOUT: case STUDENTSTAT:
+                return messageFactory.createMessage(type);
+            //case(all types of permission messages)
+            case LOGIN: case ADMINREG: case STUDENTREG:
+                return permissionMessageDecoder(nextByte);
+            //case(al types of course messages)
+            case COURSEREG: case COURSESTAT: case KDAMCHECK: case UNREGISTER: case ISREGISTERED:
+                return courseMessageDecoder(nextByte);
+        }
+
 
         return null;
     }
     private Message permissionMessageDecoder(byte nextByte) {
-        //if decMsg == nul
-        //init permission msg
-        //else
-            //if (!nextByte == 0) {
-                //put byte in stringbuffer
-            //else
-                //put 0 byte in buffer
-//              if buffer full
-//                put string in password
-//                clear buffer
-//                return msg
-//              else
-//                put user name in message
-        return null;
+        //if we didn't start decode the message
+        if(decodedMsg == null) {
+            //init permission msg
+            decodedMsg = messageFactory.createMessage(type, "", "");
+        }
+        //if next byte still part of the message protocol
+        if(nextByte != 0) {
+            //put byte in stringbuffer
+            stringBuffer.write(nextByte);
+        }
+        else {
+            //put 0 byte in buffer to know we end a parameter
+            byteBuffer.put((byte) 0);
+            //check witch parameter it is
+            if (!byteBuffer.hasRemaining()) {
+                // create the parameter and update
+                String pasword = new String(stringBuffer.toByteArray(), StandardCharsets.UTF_8);
+                decodedMsg.setPassword(pasword);
+                byteBuffer.clear();
+                return decodedMsg;
+            }
+            // create the parameter and update
+            String username = new String(stringBuffer.toByteArray(),StandardCharsets.UTF_8);
+            decodedMsg.setUserName(username);
+        }
+        return decodedMsg;
     }
     private Message courseMessageDecoder(byte nextByte) {
-//        if decMsg == nul
-//              init course msg
-//        else
-//            put next byte in buffer
-//            if buffer full
-//                resolve course number put in message and return message
-//                clear buffer
-        return null;
+        //if we didn't start decode the message
+        if(decodedMsg == null) {
+            //init course msg
+            decodedMsg = messageFactory.createMessage(type,-1);
+        }
+//        else put next byte in buffer
+        byteBuffer.put(nextByte);
+        if (!byteBuffer.hasRemaining()){
+            // resolve course number put in message and return message
+            int courseNum = bytesToShort(byteBuffer.array());
+            decodedMsg.setCourseNum(courseNum);
+            byteBuffer.clear();
+        }
+        return decodedMsg;
     }
 
 
@@ -76,9 +111,10 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
         return encodedResponse;
     }
 
-    private byte[] encodeAck(Ack ack){}
+    private byte[] encodeAck(Ack ack){return  null;}
     //transform source and optional to bytes
-    private byte[] encodeErr(Error err){}
+
+    private byte[] encodeErr(Error err){return null;}
     //transform source bytes
 
     private static byte[] shortToBytes ( short num)
