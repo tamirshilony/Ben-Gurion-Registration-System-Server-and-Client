@@ -37,7 +37,7 @@ public class Database {
 	 * loades the courses from the file path specified 
 	 * into the Database, returns true if successful.
 	 */
-	boolean initialize(String coursesFilePath) {
+	private boolean initialize(String coursesFilePath) {
 		try (Scanner scanner = new Scanner(new File(coursesFilePath))) {
 			while (scanner.hasNext()) {
 				String courseInfo = scanner.nextLine();

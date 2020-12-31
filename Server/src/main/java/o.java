@@ -1,10 +1,9 @@
-import sun.security.util.ArrayUtil;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Vector;
+import java.nio.charset.StandardCharsets;
 
-public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<Message>{
+public class o implements MessageEncoderDecoder<Message>{
     MessageFactory messageFactory = new MessageFactory();
     ByteBuffer byteBuffer = ByteBuffer.allocate(2);
     ByteBuffer stringBuffer = ByteBuffer.allocate(4);
@@ -60,28 +59,23 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
 
     @Override
     public byte[] encode(Message message) {
-        OpcodeType type = message.getType();
-        byte[] opByte = shortToBytes((short)type.ordinal());
-        byte[] sourceOpcode = new byte[0];
-        switch (type){
-            case ACK:
-                sourceOpcode = encodeAck((Ack)message);
-            case ERR:
-                sourceOpcode = encodeErr((Error)message);
+        ResponseMessage msg = (ResponseMessage)message;
+        OpcodeType type = msg.getType();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4);
+        try {
+            out.write(shortToBytes((short)type.ordinal()));
+            out.write(shortToBytes((short)msg.getSourceMsgType().ordinal()));
+            if(type == OpcodeType.ACK) {
+                out.write(msg.getOptionalData().getBytes(StandardCharsets.UTF_8));
+                out.write((byte) 0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        byte[] encodedResponse = new byte[opByte.length+sourceOpcode.length];
-        System.arraycopy(opByte, 0, encodedResponse,0, opByte.length);
-        System.arraycopy(sourceOpcode, 0, encodedResponse,opByte.length, sourceOpcode.length);
-
-        return encodedResponse;
+        return out.toByteArray();
     }
 
-    private byte[] encodeAck(Ack ack){}
-    //transform source and optional to bytes add 0 byte
-    private byte[] encodeErr(Error err){}
-    //transform source bytes
-
-    private static byte[] shortToBytes ( short num)
+    private static byte[] shortToBytes (short num)
     {
         byte[] bytesArr = new byte[2];
         bytesArr[0] = (byte) ((num >> 8) & 0xFF);

@@ -76,9 +76,9 @@ public class RegistrationMessageHandler {
         // check if user register to courseNum
         isRegister = registeredCourses.contains(coursNum);
         if(isRegister)
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"REGISTERED\0");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"REGISTERED");
         else
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER\0");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER");
     }
 
     private Message courseStat(CourseMessage msg){

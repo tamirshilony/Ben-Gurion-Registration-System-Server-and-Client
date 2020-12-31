@@ -8,26 +8,22 @@ public class MessageFactory {
     }
 
     //PermissionMessage creator
-    public Message createMessage(OpcodeType type,String useName,String password){
+    public PermissionMessage createMessage(OpcodeType type,String useName,String password){
         return new PermissionMessage(type,useName,password);
     }
 
     //CourseMessage creator
-    public Message createMessage(OpcodeType type,int courseNum){
+    public CourseMessage createMessage(OpcodeType type,int courseNum){
         return new CourseMessage(type,courseNum);
     }
 
-    //Ack/Err creator
-    public Message createMessage(OpcodeType type, OpcodeType sourceType){
-        if (type == OpcodeType.ERR)
-            return new Error(sourceType);
-        else
-            return new Ack(sourceType);
+    //response creators
+    public ResponseMessage createMessage(OpcodeType type, OpcodeType sourceType){
+            return new ResponseMessage(type, sourceType);
     }
-    //Ack with optional string creator
-    public Message createMessage(OpcodeType type, OpcodeType sourceOp,String response){
-        //OpcodeType type only for uniformity with ack/err creator
-        return new Ack(sourceOp,response);
+
+    public ResponseMessage createMessage(OpcodeType type, OpcodeType sourceOp,String response){
+        return new ResponseMessage(type, sourceOp,response);
     }
 
 }
