@@ -4,7 +4,7 @@ public class PermissionMessageHandler extends MessageHandler {
     private Database db = Database.getInstance();
     private MessageFactory messageFactory = new MessageFactory();
     private boolean isRegistered = false;
-    private String userName;
+    private String userName = null;
     private boolean isAdmin = false;
     private boolean isLoggedin = false;
 
@@ -16,7 +16,6 @@ public class PermissionMessageHandler extends MessageHandler {
         // check register condition and update field
         if(db.register(msg.getUserName(),msg.getPassword())!= null){
             isRegistered = true;
-            userName = msg.getUserName();
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
                 isAdmin =true;
@@ -36,6 +35,7 @@ public class PermissionMessageHandler extends MessageHandler {
         if(user != null && msg.getPassword() == user.getUserPassword()){
             //update field
             isLoggedin = true;
+            userName = msg.getUserName();
             return messageFactory.createMessage(type,type);
         }
         else {
@@ -58,6 +58,7 @@ public class PermissionMessageHandler extends MessageHandler {
                 return messageFactory.createMessage(OpcodeType.ERR, type);
         }
         else if (type == OpcodeType.LOGOUT) {
+            userName = null;
             isLoggedin = false;
             return messageFactory.createMessage(OpcodeType.ACK, type);
         }
