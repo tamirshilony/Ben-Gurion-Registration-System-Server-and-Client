@@ -14,7 +14,7 @@ public class PermissionMessageHandler extends MessageHandler {
     private Message registerUser(PermissionMessage msg){
         OpcodeType type = msg.getType();
         // check register condition and update field
-        if(db.register(msg.getUserName(),msg.getPassword())!= null){
+        if(db.register(msg.getUserName(),msg.getPassword())== null){
             isRegistered = true;
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
@@ -46,7 +46,7 @@ public class PermissionMessageHandler extends MessageHandler {
     public Message handleMessage(Message msg){
         OpcodeType type = msg.getType();
         if(!isRegistered){
-            if(type == OpcodeType.STUDENTREG)
+            if(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG)
                 return registerUser((PermissionMessage)msg);
             else
                 return messageFactory.createMessage(OpcodeType.ERR,type);
