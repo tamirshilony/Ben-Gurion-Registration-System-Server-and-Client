@@ -1,4 +1,8 @@
 #include <stdlib.h>
+<<<<<<< HEAD
+=======
+#include <iostream>
+>>>>>>> ofer
 #include "../include/connectionHandler.h"
 
 /**
