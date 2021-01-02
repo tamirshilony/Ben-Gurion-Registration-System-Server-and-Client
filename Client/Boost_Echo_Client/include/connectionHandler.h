@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <boost/asio.hpp>
+#include <algorithm>
 
 using namespace std;
 using boost::asio::ip::tcp;

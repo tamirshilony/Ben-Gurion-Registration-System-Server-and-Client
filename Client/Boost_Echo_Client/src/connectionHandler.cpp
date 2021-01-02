@@ -129,18 +129,13 @@ bool ConnectionHandler::encode (std::string keybboardString) {
             toSend.push_back(i);
         else
             toSend.push_back('\0');
-        if ((opCode > 0 && opCode <= 3) || opCode == 8)
-            toSend.push_back('\0');
-
-        return true;
     }
+    if ((opCode > 0 && opCode <= 3) || opCode == 8)
+        toSend.push_back('\0');
+
+    return true;
 }
 
-void ConnectionHandler::shortToBytes(short num, char* bytesArr)
-{
-    bytesArr[0] = ((num >> 8) & 0xFF);
-    bytesArr[1] = (num & 0xFF);
-}
 
 void ConnectionHandler::shortToBytes(short num, vector<char>& toConvert){
     toConvert.push_back(((num >> 8) & 0xFF));
