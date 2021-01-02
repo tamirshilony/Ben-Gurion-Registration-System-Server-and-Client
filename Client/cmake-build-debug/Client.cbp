@@ -84,7 +84,13 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/spl211/stud/SPL/ass3/SPL3/Client/main.cpp">
+		<Unit filename="/home/spl211/stud/SPL/ass3/SPL3/Client/Boost_Echo_Client/include/connectionHandler.h">
+			<Option target="Client"/>
+		</Unit>
+		<Unit filename="/home/spl211/stud/SPL/ass3/SPL3/Client/Boost_Echo_Client/src/connectionHandler.cpp">
+			<Option target="Client"/>
+		</Unit>
+		<Unit filename="/home/spl211/stud/SPL/ass3/SPL3/Client/Boost_Echo_Client/src/echoClient.cpp">
 			<Option target="Client"/>
 		</Unit>
 		<Unit filename="/home/spl211/stud/SPL/ass3/SPL3/Client/CMakeLists.txt">
