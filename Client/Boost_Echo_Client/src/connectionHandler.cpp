@@ -6,7 +6,7 @@ using std::cin;
 using std::cerr;
 using std::endl;
 using std::string;
- 
+
 
 ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
     socket_(io_service_){
@@ -17,7 +17,7 @@ ConnectionHandler::~ConnectionHandler() {
 }
 
 bool ConnectionHandler::connect() {
-    std::cout << "Starting connect to " 
+    std::cout << "Starting connect to "
         << host_ << ":" << port_ << std::endl;
     try {
 		tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
@@ -32,13 +32,13 @@ bool ConnectionHandler::connect() {
     }
     return true;
 }
- 
+
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
     size_t tmp = 0;
 	boost::system::error_code error;
     try {
         while (!error && bytesToRead > tmp ) {
-			tmp += socket_.read_some(boost::asio::buffer(bytes+tmp, bytesToRead-tmp), error);			
+			tmp += socket_.read_some(boost::asio::buffer(bytes+tmp, bytesToRead-tmp), error);
         }
 		if(error)
 			throw boost::system::system_error(error);
@@ -64,7 +64,7 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
     }
     return true;
 }
- 
+
 bool ConnectionHandler::getLine(std::string& line) {
     return getFrameAscii(line, '\n');
 }
@@ -72,7 +72,7 @@ bool ConnectionHandler::getLine(std::string& line) {
 bool ConnectionHandler::sendLine(std::string& line) {
     return sendFrameAscii(line, '\n');
 }
- 
+
 
 bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     char ch;
@@ -84,7 +84,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
 		{
 			return false;
 		}
-		if(ch!='\0')  
+		if(ch!='\0')
 			frame.append(1, ch);
 	}while (delimiter != ch);
     } catch (std::exception& e) {
@@ -93,14 +93,14 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     }
     return true;
 }
- 
+
 
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
 	bool result=sendBytes(frame.c_str(),frame.length());
 	if(!result) return false;
 	return sendBytes(&delimiter,1);
 }
- 
+
 // Close down the connection properly.
 void ConnectionHandler::close() {
     try{
@@ -113,14 +113,36 @@ void ConnectionHandler::close() {
 vector<string> ConnectionHandler::getCommands() {
     return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",
                           "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERR"};
-
 }
 
-std::string ConnectionHandler::encode (std::string keybboardString){
+bool ConnectionHandler::encode (std::string keybboardString) {
     //replace command by opNum
-    std::string delimiter = " ";
-    std::string command = keybboardString.substr(0, keybboardString.find(delimiter));
+    vector<char> toSend;
+    char delimiter = ' ';
+    string commandName = keybboardString.substr(0, keybboardString.find(delimiter));
+    string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());;
+    short opCode = distance(getCommands().begin(),
+                            find(getCommands().begin(), getCommands().end(), commandName));
+    shortToBytes(opCode, toSend);
+    for (char i : restOfString) {
+        if (i != delimiter)
+            toSend.push_back(i);
+        else
+            toSend.push_back('\0');
+        if ((opCode > 0 && opCode <= 3) || opCode == 8)
+            toSend.push_back('\0');
 
-    return command;
+        return true;
+    }
 }
 
+void ConnectionHandler::shortToBytes(short num, char* bytesArr)
+{
+    bytesArr[0] = ((num >> 8) & 0xFF);
+    bytesArr[1] = (num & 0xFF);
+}
+
+void ConnectionHandler::shortToBytes(short num, vector<char>& toConvert){
+    toConvert.push_back(((num >> 8) & 0xFF));
+    toConvert.push_back(num & 0xFF);
+}
