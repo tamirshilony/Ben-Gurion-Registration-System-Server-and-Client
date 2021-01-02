@@ -1,3 +1,8 @@
+package bgu.spl.net.impl;
+
+import bgu.spl.net.api.MessagingProtocol;
+import bgu.spl.net.impl.Messages.*;
+
 public class BGURSProtocol implements MessagingProtocol<Message> {
     private boolean shouldTerminate = false;
     private PermissionMessageHandler permissionMessageHandler;

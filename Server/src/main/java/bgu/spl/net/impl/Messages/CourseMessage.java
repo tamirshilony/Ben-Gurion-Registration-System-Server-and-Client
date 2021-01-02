@@ -1,3 +1,5 @@
+package bgu.spl.net.impl.Messages;
+
 public class CourseMessage extends Message{
     private int courseNum;
 

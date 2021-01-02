@@ -1,3 +1,5 @@
+package bgu.spl.net.impl;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -19,11 +21,15 @@ public class Database {
 	private ConcurrentHashMap<Integer,Course>courseID2Course;
 	private ConcurrentHashMap<String,User>userName2User;
 
+	//for test only
+	private Vector<Integer> sortedCourses;
 	//to prevent user from creating new Database
 
 	private Database() {
 		courseID2Course = new ConcurrentHashMap<>();
 		userName2User = new ConcurrentHashMap<>();
+
+		Vector<Integer> sortedCourses= new Vector<>();
 	}
 
 	/**
@@ -37,7 +43,7 @@ public class Database {
 	 * loades the courses from the file path specified 
 	 * into the Database, returns true if successful.
 	 */
-	boolean initialize(String coursesFilePath) {
+	private boolean initialize(String coursesFilePath) {
 		try (Scanner scanner = new Scanner(new File(coursesFilePath))) {
 			while (scanner.hasNext()) {
 				String courseInfo = scanner.nextLine();
@@ -76,4 +82,7 @@ public class Database {
 		return courseID2Course.get(courseNum);
 	}
 
+	public Vector<Integer> getAllCourses() {
+		return sortedCourses;
+	}
 }

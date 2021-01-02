@@ -1,3 +1,8 @@
+package bgu.spl.net.impl;
+
+import bgu.spl.net.impl.Messages.Message;
+import bgu.spl.net.srv.Reactor;
+
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -27,21 +32,9 @@ public class main {
 ////        test login wrong password
 //        Message m4 = messageFactory.createMessage(OpcodeType.LOGIN,"ofer", "wrong password");
 //        Message response3 = protocol.process(m4);
-//        System.out.println(OpcodeType.ADMINREG.ordinal());
-//        short i = 5;
-//        byte [] ar = shortToBytes(i);
-//        System.out.println(ar.getClass());
-//        System.out.println("".getBytes(StandardCharsets.UTF_8));
-//        byte[] b = "".getBytes(StandardCharsets.UTF_8);
-//        System.out.println(b.length);
-        OpcodeType type = OpcodeType.values()[1];
+        Reactor<Message> server = new Reactor<>(3,7777,
+                () -> new BGURSProtocol(),() -> new RegistrationMessageEncoderDecoder());
+        server.serve();
 
-    }
-    public static byte[] shortToBytes ( short num)
-    {
-        byte[] bytesArr = new byte[2];
-        bytesArr[0] = (byte) ((num >> 8) & 0xFF);
-        bytesArr[1] = (byte) (num & 0xFF);
-        return bytesArr;
     }
 }

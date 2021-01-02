@@ -1,3 +1,6 @@
+package bgu.spl.net.impl;
+
+import bgu.spl.net.impl.Messages.*;
 import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -76,9 +79,9 @@ public class RegistrationMessageHandler {
         // check if user register to courseNum
         isRegister = registeredCourses.contains(coursNum);
         if(isRegister)
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"REGISTERED\0");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"REGISTERED");
         else
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER\0");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER");
     }
 
     private Message courseStat(CourseMessage msg){
@@ -117,11 +120,21 @@ public class RegistrationMessageHandler {
         User user = db.getUser(name);
         // get the course the user register
         Vector<Integer> registerCourses = user.getRegisteredCourses();
-        // sort by txt.file
-
+        // sort by txt.file for tests
+        registerCourses = sortCoursesForTest(registerCourses);
         //string for response
         String registerCourseNum = registerCourses.toString();
         return  messageFactory.createMessage(OpcodeType.ACK,msg.getType(),userName + "\n" + registerCourseNum);
 
+    }
+
+    private Vector<Integer> sortCoursesForTest(Vector<Integer> registerCourses){
+        Vector<Integer> sortedCourses = new Vector<>(registerCourses.size());
+        Vector<Integer> allCourses = db.getAllCourses();
+        for (Integer courseNum: allCourses) {
+            if (registerCourses.contains(courseNum))
+                sortedCourses.add(courseNum);
+        }
+        return  sortedCourses;
     }
 }
