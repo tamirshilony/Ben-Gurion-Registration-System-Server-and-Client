@@ -1,4 +1,7 @@
 #include <stdlib.h>
+
+#include <iostream>
+
 #include "../include/connectionHandler.h"
 
 /**

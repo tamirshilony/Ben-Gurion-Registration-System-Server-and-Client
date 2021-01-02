@@ -93,6 +93,12 @@
 		<Unit filename="/home/ofer/Desktop/Studies/SPL/SPL3/Client/Boost_Echo_Client/src/echoClient.cpp">
 			<Option target="Client"/>
 		</Unit>
+<<<<<<< HEAD
+=======
+		<Unit filename="/home/ofer/Desktop/Studies/SPL/SPL3/Client/Boost_Echo_Client/src/main.cpp">
+			<Option target="Client"/>
+		</Unit>
+>>>>>>> 169d4e1f514adcb889c1a8f1be35f01b6496385b
 		<Unit filename="/home/ofer/Desktop/Studies/SPL/SPL3/Client/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>

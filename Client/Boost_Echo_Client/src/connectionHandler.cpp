@@ -7,6 +7,7 @@ using std::cerr;
 using std::endl;
 using std::string;
  
+
 ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
     socket_(io_service_){
 }
@@ -93,7 +94,7 @@ bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
     return true;
 }
  
- 
+
 bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
 	bool result=sendBytes(frame.c_str(),frame.length());
 	if(!result) return false;
@@ -109,4 +110,17 @@ void ConnectionHandler::close() {
     }
 }
 
+vector<string> ConnectionHandler::getCommands() {
+    return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",
+                          "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERR"};
+
+}
+
+std::string ConnectionHandler::encode (std::string keybboardString){
+    //replace command by opNum
+    std::string delimiter = " ";
+    std::string command = keybboardString.substr(0, keybboardString.find(delimiter));
+
+    return command;
+}
 

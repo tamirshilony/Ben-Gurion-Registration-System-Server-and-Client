@@ -5,6 +5,7 @@
 #include <iostream>
 #include <boost/asio.hpp>
 
+using namespace std;
 using boost::asio::ip::tcp;
 
 class ConnectionHandler {
@@ -14,7 +15,7 @@ private:
 	boost::asio::io_service io_service_;   // Provides core I/O functionality
 	tcp::socket socket_;
 
- 
+
 public:
     ConnectionHandler(std::string host, short port);
     virtual ~ConnectionHandler();
@@ -48,7 +49,11 @@ public:
 	
     // Close down the connection properly.
     void close();
- 
+    std::string encode (std::string keybboardString);
+
+    vector<string> getCommands();
+
+
 }; //class ConnectionHandler
  
 #endif
