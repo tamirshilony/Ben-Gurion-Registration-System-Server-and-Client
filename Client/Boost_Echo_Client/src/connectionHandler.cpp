@@ -1,20 +1,21 @@
-
 #include "../include/connectionHandler.h"
 
 using boost::asio::ip::tcp;
 
 using std::cin;
-using std::cout;
+us>>>>>>> ofer1ing std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
  
-ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(), socket_(io_service_){}
-    
+ConnectionHandler::ConnectionHandler(string host, short port): host_(host), port_(port), io_service_(),
+    socket_(io_service_),opCode(getEnums()){
+}
+
 ConnectionHandler::~ConnectionHandler() {
     close();
 }
- 
+
 bool ConnectionHandler::connect() {
     std::cout << "Starting connect to " 
         << host_ << ":" << port_ << std::endl;
@@ -107,4 +108,9 @@ void ConnectionHandler::close() {
     } catch (...) {
         std::cout << "closing failed: connection already closed" << std::endl;
     }
+}
+
+enum ConnectionHandler::getEnums(){
+    return enum {NOTEXIST,ADMINREG,STUDENTREG,LOGIN,LOGOUT,COURSEREG,KDAMCHECK,COURSESTAT,STUDENTSTAT,
+    ISREGISTERED,UNREGISTER,MYCOURSES,ACK,ERR};
 }
