@@ -1,3 +1,5 @@
+package bgu.spl.net.api;
+
 public interface MessagingProtocol<T> {
  
     /**

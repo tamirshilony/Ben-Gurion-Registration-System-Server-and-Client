@@ -1,3 +1,5 @@
+package bgu.spl.net.impl.Messages;
+
 public abstract class  Message {
     protected OpcodeType type;
     private String userName;

@@ -1,7 +1,8 @@
-import java.util.List;
-import java.util.Set;
+package bgu.spl.net.impl;
+
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 public class Course {
     private final int courseNum;

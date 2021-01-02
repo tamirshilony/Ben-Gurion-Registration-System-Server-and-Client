@@ -1,12 +1,14 @@
-import java.util.Vector;
+package bgu.spl.net.impl;
+
+import bgu.spl.net.impl.Messages.*;
 
 public class PermissionMessageHandler extends MessageHandler {
     private Database db = Database.getInstance();
     private MessageFactory messageFactory = new MessageFactory();
     private boolean isRegistered = false;
     private String userName = null;
-    private boolean isAdmin = false;
     private boolean isLoggedin = false;
+    private boolean isAdmin = false;
 
     public PermissionMessageHandler(){
     }

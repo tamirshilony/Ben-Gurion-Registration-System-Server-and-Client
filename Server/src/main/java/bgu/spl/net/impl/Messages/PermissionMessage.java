@@ -1,3 +1,4 @@
+package bgu.spl.net.impl.Messages;
 public class PermissionMessage extends Message{
 
 

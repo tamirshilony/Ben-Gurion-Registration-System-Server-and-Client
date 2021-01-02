@@ -1,6 +1,10 @@
+package bgu.spl.net.impl;
 
+import bgu.spl.net.api.MessageEncoderDecoder;
+import bgu.spl.net.impl.Messages.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -11,13 +15,15 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
     ByteBuffer byteBuffer = ByteBuffer.allocate(2);
     ByteArrayOutputStream stringBuffer = new ByteArrayOutputStream(4);
     OpcodeType type = null;
-    Message decodedMsg = null;
-
+    PermissionMessage decodedPermissionMsg = null;
+    CourseMessage decodedCourseMsg = null;
 
     @Override
     public Message decodeNextByte(byte nextByte) {
         //if opcode is null
         if(type == null){
+            decodedPermissionMsg = null;
+            decodedCourseMsg = null;
             //put next byte in buffer
             byteBuffer.put(nextByte);
             //if buffer not full return null
@@ -44,14 +50,13 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
                 return courseMessageDecoder(nextByte);
         }
 
-
         return null;
     }
     private Message permissionMessageDecoder(byte nextByte) {
         //if we didn't start decode the message
-        if(decodedMsg == null) {
+        if(decodedPermissionMsg == null) {
             //init permission msg
-            decodedMsg = messageFactory.createMessage(type, "", "");
+            decodedPermissionMsg = messageFactory.createMessage(type, "", "");
         }
         //if next byte still part of the message protocol
         if(nextByte != 0) {
@@ -59,63 +64,58 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
             stringBuffer.write(nextByte);
         }
         else {
-            //put 0 byte in buffer to know we end a parameter
+            //put 0 byteif(decodedMsg == null) { in buffer to know we end a parameter
             byteBuffer.put((byte) 0);
             //check witch parameter it is
             if (!byteBuffer.hasRemaining()) {
                 // create the parameter and update
                 String pasword = new String(stringBuffer.toByteArray(), StandardCharsets.UTF_8);
-                decodedMsg.setPassword(pasword);
+                decodedPermissionMsg.setPassword(pasword);
                 byteBuffer.clear();
-                return decodedMsg;
+                return decodedPermissionMsg;
             }
             // create the parameter and update
             String username = new String(stringBuffer.toByteArray(),StandardCharsets.UTF_8);
-            decodedMsg.setUserName(username);
+            decodedPermissionMsg.setUserName(username);
         }
-        return decodedMsg;
+        return null;
     }
     private Message courseMessageDecoder(byte nextByte) {
         //if we didn't start decode the message
-        if(decodedMsg == null) {
+        if(decodedCourseMsg == null) {
             //init course msg
-            decodedMsg = messageFactory.createMessage(type,-1);
+            decodedCourseMsg = messageFactory.createMessage(type,-1);
         }
 //        else put next byte in buffer
         byteBuffer.put(nextByte);
         if (!byteBuffer.hasRemaining()){
             // resolve course number put in message and return message
             int courseNum = bytesToShort(byteBuffer.array());
-            decodedMsg.setCourseNum(courseNum);
+            decodedCourseMsg.setCourseNum(courseNum);
             byteBuffer.clear();
+            return decodedCourseMsg;
         }
-        return decodedMsg;
+        return null;
     }
 
 
-    @Override
     public byte[] encode(Message message) {
-        OpcodeType type = message.getType();
-        byte[] opByte = shortToBytes((short)type.ordinal());
-        byte[] sourceOpcode = new byte[0];
-        switch (type){
-            case ACK:
-                sourceOpcode = encodeAck((Ack)message);
-            case ERR:
-                sourceOpcode = encodeErr((Error)message);
+        ResponseMessage msg = (ResponseMessage)message;
+        OpcodeType type = msg.getType();
+        ByteArrayOutputStream out = new ByteArrayOutputStream(4);
+        try {
+            out.write(shortToBytes((short)type.ordinal()));
+            out.write(shortToBytes((short)msg.getSourceMsgType().ordinal()));
+            if(type == OpcodeType.ACK) {
+                out.write(msg.getOptionalData().getBytes(StandardCharsets.UTF_8));
+                out.write((byte) 0);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        byte[] encodedResponse = new byte[opByte.length+sourceOpcode.length];
-        System.arraycopy(opByte, 0, encodedResponse,0, opByte.length);
-        System.arraycopy(sourceOpcode, 0, encodedResponse,opByte.length, sourceOpcode.length);
-
-        return encodedResponse;
+        return out.toByteArray();
     }
 
-    private byte[] encodeAck(Ack ack){return  null;}
-    //transform source and optional to bytes
-
-    private byte[] encodeErr(Error err){return null;}
-    //transform source bytes
 
     private static byte[] shortToBytes ( short num)
     {

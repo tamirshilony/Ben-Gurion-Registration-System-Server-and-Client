@@ -1,3 +1,5 @@
+package bgu.spl.net.impl;
+
 import java.util.Vector;
 
 public class User {
