@@ -130,7 +130,7 @@ bool ConnectionHandler::encode (string keybboardString, char delimiter) {
         toSend.push_back('\0');
 
     //sendBytes try with pointer to toSend vector
-    bool result=sendBytes(&toSend[0],toSend.length());
+    bool result=sendBytes(&toSend[0],toSend.size());
     if(!result) return false;
     return sendBytes(&delimiter,1);
 }
@@ -140,28 +140,28 @@ bool ConnectionHandler::decode(string response, char delimiter) {
     char bytes[2];
     try {
         //get two first bytes convert to short add corresponding command to response
-        if (!getBytes(&bytes, 2))
+        if (!getBytes(bytes, 2))
             return false;
         string command = getCommands()[bytesToShort(bytes)];
         response.append(command);
         //get next two bytes convert to short add " " and srcopcode to response
-        if (!getBytes(&bytes, 2))
+        if (!getBytes(bytes, 2))
             return false;
         response.append(" ");
-        response.append(bytesToShort(bytes));
+        response.append(1, bytesToShort(bytes));
         //if ack continue reading
         if (command == "ACK") {
             response.append(" ");
-            while (bytes != '\0'){
+            while (bytes[1] != '\0'){
                 if (!getBytes(&bytes[1], 1))
                     return false;
-                response.append(bytes[1]);
+                response.append(1, bytes[1]);
             }
         }
     }catch (exception& e) {
         cerr << "recv failed2 (Error: " << e.what() << ')' << endl;
-        return false
-    }return true
+        return false;
+    }return true;
 }
 
 
