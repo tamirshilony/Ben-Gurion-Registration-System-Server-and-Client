@@ -110,11 +110,6 @@ void ConnectionHandler::close() {
     }
 }
 
-vector<string> ConnectionHandler::getCommands() {
-    return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",
-                          "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERR"};
-}
-
 bool ConnectionHandler::encode (std::string keybboardString) {
     //replace command by opNum
     vector<char> toSend;
@@ -133,11 +128,27 @@ bool ConnectionHandler::encode (std::string keybboardString) {
     if ((opCode > 0 && opCode <= 3) || opCode == 8)
         toSend.push_back('\0');
 
+    //sendBytes try with pointer to toSend vector
     return true;
+}
+
+bool ConnectionHandler::decode(string response) {
+    //char to check at each reading
+    //get two first bytes and convert to short add to response
+    //get next two bytes convert to short add " " and than srcopcode to response
+    //if error add \n
+    //if ack read till \0
+    //add every char to response and \n
 }
 
 
 void ConnectionHandler::shortToBytes(short num, vector<char>& toConvert){
     toConvert.push_back(((num >> 8) & 0xFF));
     toConvert.push_back(num & 0xFF);
+}
+
+
+vector<string> ConnectionHandler::getCommands() {
+    return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",
+                          "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERR"};
 }

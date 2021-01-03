@@ -17,8 +17,12 @@ private:
 	tcp::socket socket_;
 
 
+    void shortToBytes(short num, vector<char>& toConvert);
+    vector<string> getCommands();
 public:
+
     ConnectionHandler(std::string host, short port);
+
     virtual ~ConnectionHandler();
 
     // Connect to the remote machine
@@ -51,11 +55,8 @@ public:
     // Close down the connection properly.
     void close();
 
+    bool decode (string response);
     bool encode (std::string keybboardString);
-
-    vector<string> getCommands();
-
-    void shortToBytes(short num, vector<char>& toConvert);
 }; //class ConnectionHandler
 
 #endif
