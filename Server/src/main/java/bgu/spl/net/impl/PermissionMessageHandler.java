@@ -20,7 +20,7 @@ public class PermissionMessageHandler extends MessageHandler {
             isRegistered = true;
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
-                isAdmin =true;
+                db.addAdmin(msg.getUserName());
             return messageFactory.createMessage(OpcodeType.ACK,type);
         }
         else {
@@ -38,6 +38,8 @@ public class PermissionMessageHandler extends MessageHandler {
             //update field
             isLoggedin = true;
             userName = msg.getUserName();
+            if(db.isAdmin(userName))
+                isAdmin = true;
             return messageFactory.createMessage(type,type);
         }
         else {

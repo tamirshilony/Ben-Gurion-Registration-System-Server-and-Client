@@ -20,6 +20,7 @@ public class Database {
 	}
 	private ConcurrentHashMap<Integer,Course>courseID2Course;
 	private ConcurrentHashMap<String,User>userName2User;
+	Vector<String> admins;
 
 	//for test only
 	private Vector<Integer> sortedCourses;
@@ -28,6 +29,7 @@ public class Database {
 	private Database() {
 		courseID2Course = new ConcurrentHashMap<>();
 		userName2User = new ConcurrentHashMap<>();
+		admins = new Vector<>();
 
 		Vector<Integer> sortedCourses= new Vector<>();
 	}
@@ -84,5 +86,13 @@ public class Database {
 
 	public Vector<Integer> getAllCourses() {
 		return sortedCourses;
+	}
+
+	public void addAdmin(String userName){
+		admins.add(userName);
+	}
+
+	public boolean isAdmin(String userName){
+		return admins.contains(userName);
 	}
 }
