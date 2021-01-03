@@ -115,9 +115,9 @@ bool ConnectionHandler::encode (string keybboardString, char delimiter) {
     vector<char> toSend;
     //resolve opcode
     string commandName = keybboardString.substr(0, keybboardString.find(delimiter));
-    string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());;
-    short opCode = distance(getCommands().begin(),
-                            find(getCommands().begin(), getCommands().end(), commandName));
+    string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());
+    vector<string> allCommands = getCommands();
+    short opCode = distance(allCommands.begin(), find(allCommands.begin(), allCommands.end(), commandName));
     shortToBytes(opCode, toSend);
     //
     for (char i : restOfString) {

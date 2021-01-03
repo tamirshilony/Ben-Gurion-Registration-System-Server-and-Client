@@ -3,10 +3,6 @@
 #include <thread>
 #include "../include/connectionHandler.h"
 
-
-
-
-
 class KeyboardReader{
 private:
     ConnectionHandler &connectionHandler;
