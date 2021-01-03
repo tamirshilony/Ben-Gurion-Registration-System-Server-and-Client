@@ -17,8 +17,16 @@ private:
 	tcp::socket socket_;
 
 
+    bool decode (string response, char delimiter);
+
+    bool encode (string keybboardString, char delimiter);
+
     void shortToBytes(short num, vector<char>& toConvert);
+
+    short bytesToShort(char* bytesArr);
+
     vector<string> getCommands();
+
 public:
 
     ConnectionHandler(std::string host, short port);
@@ -54,9 +62,6 @@ public:
 
     // Close down the connection properly.
     void close();
-
-    bool decode (string response);
-    bool encode (std::string keybboardString);
 }; //class ConnectionHandler
 
 #endif

@@ -66,11 +66,11 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 }
 
 bool ConnectionHandler::getLine(std::string& line) {
-    return getFrameAscii(line, '\n');
+    return decode(line, ' ');
 }
 
 bool ConnectionHandler::sendLine(std::string& line) {
-    return sendFrameAscii(line, '\n');
+    return encode(line, ' ');
 }
 
 
@@ -110,15 +110,16 @@ void ConnectionHandler::close() {
     }
 }
 
-bool ConnectionHandler::encode (std::string keybboardString) {
+bool ConnectionHandler::encode (string keybboardString, char delimiter) {
     //replace command by opNum
     vector<char> toSend;
-    char delimiter = ' ';
+    //resolve opcode
     string commandName = keybboardString.substr(0, keybboardString.find(delimiter));
     string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());;
     short opCode = distance(getCommands().begin(),
                             find(getCommands().begin(), getCommands().end(), commandName));
     shortToBytes(opCode, toSend);
+    //
     for (char i : restOfString) {
         if (i != delimiter)
             toSend.push_back(i);
@@ -129,22 +130,50 @@ bool ConnectionHandler::encode (std::string keybboardString) {
         toSend.push_back('\0');
 
     //sendBytes try with pointer to toSend vector
-    return true;
+    bool result=sendBytes(&toSend[0],toSend.length());
+    if(!result) return false;
+    return sendBytes(&delimiter,1);
 }
 
-bool ConnectionHandler::decode(string response) {
+bool ConnectionHandler::decode(string response, char delimiter) {
     //char to check at each reading
-    //get two first bytes and convert to short add to response
-    //get next two bytes convert to short add " " and than srcopcode to response
-    //if error add \n
-    //if ack read till \0
-    //add every char to response and \n
+    char bytes[2];
+    try {
+        //get two first bytes convert to short add corresponding command to response
+        if (!getBytes(&bytes, 2))
+            return false;
+        string command = getCommands()[bytesToShort(bytes)];
+        response.append(command);
+        //get next two bytes convert to short add " " and srcopcode to response
+        if (!getBytes(&bytes, 2))
+            return false;
+        response.append(" ");
+        response.append(bytesToShort(bytes));
+        //if ack continue reading
+        if (command == "ACK") {
+            response.append(" ");
+            while (bytes != '\0'){
+                if (!getBytes(&bytes[1], 1))
+                    return false;
+                response.append(bytes[1]);
+            }
+        }
+    }catch (exception& e) {
+        cerr << "recv failed2 (Error: " << e.what() << ')' << endl;
+        return false
+    }return true
 }
 
 
 void ConnectionHandler::shortToBytes(short num, vector<char>& toConvert){
     toConvert.push_back(((num >> 8) & 0xFF));
     toConvert.push_back(num & 0xFF);
+}
+
+short ConnectionHandler::bytesToShort(char* bytesArr){
+    short result = (short)((bytesArr[0] & 0xff) << 8);
+    result += (short)(bytesArr[1] & 0xff);
+    return result;
 }
 
 
