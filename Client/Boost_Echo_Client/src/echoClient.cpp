@@ -26,7 +26,7 @@ public:
             cin.getline(buf,bufferSize);
             // convert buf to string
             string command(buf);
-            if(!connectionHandler.encode(command)){
+            if(!connectionHandler.sendLine(command)){
                 cout<<"fail to send message /n"<<endl;
                 interupted = true;
             }
