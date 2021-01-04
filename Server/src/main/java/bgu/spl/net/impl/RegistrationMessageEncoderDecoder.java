@@ -17,6 +17,7 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
     OpcodeType type = null;
     PermissionMessage decodedPermissionMsg = null;
     CourseMessage decodedCourseMsg = null;
+    UserNameMessage decodedUserNameMsg = null;
 
     @Override
     public Message decodeNextByte(byte nextByte) {
@@ -24,6 +25,7 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
         if(type == null){
             decodedPermissionMsg = null;
             decodedCourseMsg = null;
+            decodedUserNameMsg = null;
             //put next byte in buffer
             byteBuffer.put(nextByte);
             //if buffer not full return null
@@ -36,12 +38,17 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
                 type = OpcodeType.values()[opcode];
                 //clear buffer
                 byteBuffer.clear();
+                if(type == OpcodeType.LOGOUT || type == OpcodeType.MYCOURSES){
+                    OpcodeType temType = type;
+                    type = null;
+                    return messageFactory.createMessage(temType);
+                }
                 return null;
             }
         }
         switch (type){
-            case MYCOURSES: case LOGOUT: case STUDENTSTAT:
-                return messageFactory.createMessage(type);
+            case STUDENTSTAT:
+                return userNameMessageDecoder(nextByte);
             //case(all types of permission messages)
             case LOGIN: case ADMINREG: case STUDENTREG:
                 return permissionMessageDecoder(nextByte);
@@ -84,6 +91,28 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
         }
         return null;
     }
+
+
+    private Message userNameMessageDecoder(byte nextByte) {
+        //if we didn't start decode the message
+        if (decodedUserNameMsg == null) {
+            //init permission msg
+            decodedUserNameMsg = messageFactory.createMessage(type, "");
+        }
+        //if next byte still part of the message protocol
+        if (nextByte != 0)
+        {
+            //put byte in stringbuffer
+            stringBuffer.write(nextByte);
+            return null;
+        }
+        String username = new String(stringBuffer.toByteArray(),StandardCharsets.UTF_8);
+        decodedUserNameMsg.setUserName(username);
+        stringBuffer.reset();
+        type = null;
+        return decodedUserNameMsg;
+    }
+
     private Message courseMessageDecoder(byte nextByte) {
         //if we didn't start decode the message
         if(decodedCourseMsg == null) {

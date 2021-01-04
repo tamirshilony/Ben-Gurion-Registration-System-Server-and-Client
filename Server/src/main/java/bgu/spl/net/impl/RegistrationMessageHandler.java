@@ -5,11 +5,11 @@ import java.util.Collections;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class RegistrationMessageHandler {
-    private Database db;
-    private MessageFactory messageFactory;
+public class RegistrationMessageHandler extends MessageHandler{
 
-    public RegistrationMessageHandler(){}
+
+    public RegistrationMessageHandler(){super();}
+
     //handle msg(msg)
     public Message handleMessage(Message msg){
         String userName = msg.getUserName();
@@ -35,40 +35,54 @@ public class RegistrationMessageHandler {
         return messageFactory.createMessage(OpcodeType.ERR, OpcodeType.NOTEXIST);
     }
 
-    private Message handleRegistration(CourseMessage msg,String userName){
+    private Message handleRegistration(CourseMessage msg,String userName)
+    {
         int courseNum = msg.getCourseNum();
         Course course = db.getCourse(courseNum);
         User user = db.getUser(userName);
-        if(!(course == null) && course.registerUser(user))
+        if(course != null && hasAllKdams(user, course) && checkCourseLimit(course) && !checkDoubleRegistration(user,course))
+        {
+            course.registerUser(user);
+            user.register2Course(courseNum);
             return messageFactory.createMessage(OpcodeType.ACK,msg.getType());
+        }
         return messageFactory.createMessage(OpcodeType.ERR,msg.getType());
     }
 
-    private Message handleUnregister(CourseMessage msg, String userName){
+    private Message handleUnregister(CourseMessage msg, String userName)
+    {
         int courseNum = msg.getCourseNum();
         Course course = db.getCourse(courseNum);
         User user = db.getUser(userName);
-        if(!(course == null) && course.unregister(user))
+        if(!(course == null) && user.isRegistered(courseNum))
+        {
+            course.unregister(user);
+            user.unregisterCourse(courseNum);
             return messageFactory.createMessage(OpcodeType.ACK,msg.getType());
+        }
         return messageFactory.createMessage(OpcodeType.ERR,msg.getType());
     }
-    private Message checKdams(CourseMessage msg) {
+    private Message checKdams(CourseMessage msg)
+    {
         int courseNum = msg.getCourseNum();
         Course course = db.getCourse(courseNum);
-        if (!(course == null)) {
+        if (!(course == null))
+        {
             Vector<Integer> kdams = course.getKdams();
             return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),kdams.toString());
         }
         return messageFactory.createMessage(OpcodeType.ERR,msg.getType());
     }
 
-    private Message studentCourses(OpCodeMessage msg,String userName){
+    private Message studentCourses(OpCodeMessage msg,String userName)
+    {
         User user = db.getUser(userName);
         Vector<Integer> courses = user.getRegisteredCourses();
         return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courses.toString());
     }
 
-    private Message isRegister(CourseMessage msg, String username){
+    private Message isRegister(CourseMessage msg, String username)
+    {
         boolean isRegister;
         // get the requested course num
         int coursNum = msg.getCourseNum();
@@ -84,7 +98,8 @@ public class RegistrationMessageHandler {
             return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER");
     }
 
-    private Message courseStat(CourseMessage msg){
+    private Message courseStat(CourseMessage msg)
+    {
         // get course num
         int courseNum = msg.getCourseNum();
         // get course instance
@@ -111,7 +126,8 @@ public class RegistrationMessageHandler {
         return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courseNum_Name + "\n" + seatsAvailable + "\n" + registerUserName);
     }
 
-    private Message studentStat(OpCodeMessage msg){
+    private Message studentStat(OpCodeMessage msg)
+    {
         // get user name
         String name = msg.getUserName();
         //string for response
@@ -128,13 +144,37 @@ public class RegistrationMessageHandler {
 
     }
 
-    private Vector<Integer> sortCoursesForTest(Vector<Integer> registerCourses){
+    private Vector<Integer> sortCoursesForTest(Vector<Integer> registerCourses)
+    {
         Vector<Integer> sortedCourses = new Vector<>(registerCourses.size());
         Vector<Integer> allCourses = db.getAllCourses();
-        for (Integer courseNum: allCourses) {
+        for (Integer courseNum: allCourses)
+        {
             if (registerCourses.contains(courseNum))
                 sortedCourses.add(courseNum);
         }
         return  sortedCourses;
     }
+
+    private boolean hasAllKdams(User user,Course course)
+    {
+        Vector<Integer> kdams = course.getKdams();
+        boolean ans = true;
+        for (int kdam:kdams) {
+            if(!user.isRegistered(kdam)) {
+                ans = false;
+                break;
+            }
+        }
+        return ans;
+    }
+
+    private boolean checkCourseLimit(Course course){
+        return (course.getLimit() > course.getNumOfRegistered());
+    }
+
+    private boolean checkDoubleRegistration(User user,Course course){
+        return user.isRegistered(course.getCourseNum());
+    }
 }
+

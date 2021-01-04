@@ -5,7 +5,7 @@ public class MessageFactory {
 
     }
     //OpCodeMessage creator
-    public Message createMessage(OpcodeType type){
+    public OpCodeMessage createMessage(OpcodeType type){
         return new OpCodeMessage(type);
     }
 
@@ -14,6 +14,10 @@ public class MessageFactory {
         return new PermissionMessage(type,useName,password);
     }
 
+    //UserNameMessage creator
+    public UserNameMessage createMessage(OpcodeType type,String useName){
+        return new UserNameMessage(type,useName);
+    }
     //CourseMessage creator
     public CourseMessage createMessage(OpcodeType type,int courseNum){
         return new CourseMessage(type,courseNum);

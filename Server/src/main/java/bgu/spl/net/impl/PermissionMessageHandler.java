@@ -3,21 +3,16 @@ package bgu.spl.net.impl;
 import bgu.spl.net.impl.Messages.*;
 
 public class PermissionMessageHandler extends MessageHandler {
-    private Database db = Database.getInstance();
-    private MessageFactory messageFactory = new MessageFactory();
-    private boolean isRegistered = false;
     private String userName = null;
     private boolean isLoggedin = false;
     private boolean isAdmin = false;
 
-    public PermissionMessageHandler(){
-    }
+    public PermissionMessageHandler(){super();}
 
     private Message registerUser(PermissionMessage msg){
         OpcodeType type = msg.getType();
         // check register condition and update field
         if(db.register(msg.getUserName(),msg.getPassword())== null){
-            isRegistered = true;
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
                 db.addAdmin(msg.getUserName());
@@ -49,26 +44,37 @@ public class PermissionMessageHandler extends MessageHandler {
 
     public Message handleMessage(Message msg){
         OpcodeType type = msg.getType();
-        if(!isRegistered){
-            if(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG)
-                return registerUser((PermissionMessage)msg);
-            else
+        if(!isLoggedin)
+        {
+            if(type != OpcodeType.LOGIN && !(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG))
                 return messageFactory.createMessage(OpcodeType.ERR,type);
+            else{
+                if(type == OpcodeType.LOGIN)
+                    return login((PermissionMessage) msg);
+                else
+                    return registerUser((PermissionMessage)msg);
+            }
         }
-        else if (!isLoggedin) {
-            if (type == OpcodeType.LOGIN)
-                return login((PermissionMessage) msg);
-            else
-                return messageFactory.createMessage(OpcodeType.ERR, type);
-        }
+//        if(isRegistered()){
+//            if(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG)
+//                return registerUser((PermissionMessage)msg);
+//            else
+//                return messageFactory.createMessage(OpcodeType.ERR,type);
+//        }
+//        else if (!isLoggedin) {
+//            if (type == OpcodeType.LOGIN)
+//                return login((PermissionMessage) msg);
+//            else
+//                return messageFactory.createMessage(OpcodeType.ERR, type);
+//        }
         else if (type == OpcodeType.LOGOUT) {
             userName = null;
             isLoggedin = false;
             return messageFactory.createMessage(OpcodeType.ACK, type);
         }
         // check admin credentials
-        else if(!isAdmin & (type == OpcodeType.COURSESTAT || type == OpcodeType.STUDENTSTAT)
-                                                    || (isAdmin & type == OpcodeType.COURSEREG))
+        else if((!isAdmin & (type == OpcodeType.COURSESTAT || type == OpcodeType.STUDENTSTAT)) ||
+                (isAdmin & type == OpcodeType.COURSEREG))
             return messageFactory.createMessage(OpcodeType.ERR,type);
         else
             msg.setUserName(userName);
@@ -83,9 +89,6 @@ public class PermissionMessageHandler extends MessageHandler {
         return isLoggedin;
     }
 
-    public boolean isRegistered() {
-        return isRegistered;
-    }
     public String getUserName() {
         return userName;
     }

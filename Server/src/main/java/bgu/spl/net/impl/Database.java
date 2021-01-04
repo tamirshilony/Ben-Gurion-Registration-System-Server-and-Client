@@ -55,8 +55,10 @@ public class Database {
 				String kdam = info[2].substring(1,info[2].length()-1);
 				String[] kdams = kdam.split(",");
 				Vector<Integer>kdamsVec = new Vector<>();
-				for (String coursNum:kdams) {
-					kdamsVec.add(Integer.parseInt(coursNum));
+				if(kdams.length > 1) {
+					for (String coursNum : kdams) {
+						kdamsVec.add(Integer.parseInt(coursNum));
+					}
 				}
 				Course currCourse = new Course(courseId,courseName,kdamsVec,limit);
 				courseID2Course.put(courseId,currCourse);
@@ -94,4 +96,5 @@ public class Database {
 	public boolean isAdmin(String userName){
 		return admins.contains(userName);
 	}
+
 }

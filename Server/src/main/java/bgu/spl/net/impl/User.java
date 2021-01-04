@@ -31,10 +31,13 @@ public class User {
         }
     }
 
+    public boolean isRegistered(int courseNum){
+        return registeredCourses.contains(courseNum);
+    }
     //boolean unRegister
     public void unregisterCourse(int courseID){
         if(registeredCourses.contains(courseID)) {
-            registeredCourses.remove(courseID);
+            registeredCourses.removeElement(courseID);
         }
     }
 
