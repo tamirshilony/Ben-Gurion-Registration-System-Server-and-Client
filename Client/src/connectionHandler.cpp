@@ -111,24 +111,37 @@ void ConnectionHandler::close() {
 }
 
 bool ConnectionHandler::encode (string &keybboardString, char delimiter) {
-    //replace command by opNum
     vector<char> toSend;
+    vector<char> editionalDataVal;
     //resolve opcode
     string commandName = keybboardString.substr(0, keybboardString.find(delimiter));
     string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());
+
+    //incase no restOfString in mycours and logout
+    if(restOfString == commandName)
+        restOfString = "";
+
     vector<string> allCommands = getCommands();
     short opCode = distance(allCommands.begin(), find(allCommands.begin(), allCommands.end(), commandName));
     shortToBytes(opCode, toSend);
     //encode rest of string
-    for (char i : restOfString) {
+    for (char i : restOfString)
+    {
         if (i != delimiter)
-            toSend.push_back(i);
+            editionalDataVal.push_back(i);
         else
-            toSend.push_back('\0');
+            editionalDataVal.push_back('\0');
+    }//deal with courses messages
+    if((opCode > 4 && opCode <= 7) || opCode == 9 || opCode == 10){
+        string stringNum(editionalDataVal.begin(), editionalDataVal.end());
+        editionalDataVal = stringToShortBytes(stringNum);
     }
+    //deal with permission messages
     if ((opCode > 0 && opCode <= 3) || opCode == 8)
-        toSend.push_back('\0');
+        editionalDataVal.push_back('\0');
 
+    //concat parts together and send
+    toSend.insert(toSend.end(),editionalDataVal.begin(),editionalDataVal.end());
     //sendBytes try with pointer to toSend vector
     bool result=sendBytes(&toSend[0],toSend.size());
     if(!result) return false;
@@ -177,6 +190,14 @@ short ConnectionHandler::bytesToShort(char* bytesArr){
     return result;
 }
 
+vector<char> ConnectionHandler::stringToShortBytes(string toConvert) {
+    vector<char> ans;
+    stringstream stream(toConvert);
+    short num = 0;
+    stream >> num;
+    shortToBytes(num, ans);
+    return ans;
+}
 
 vector<string> ConnectionHandler::getCommands() {
     return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",

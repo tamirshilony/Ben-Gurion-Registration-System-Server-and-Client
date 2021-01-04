@@ -50,6 +50,7 @@ int main (int argc, char *argv[]) {
     bool interupted = false;
     KeyboardReader keyboardReader(connectionHandler);
     thread thread1 (&KeyboardReader::run,&keyboardReader);
+
     while (!interupted) {
         std::string answer;
         if(!connectionHandler.getLine(answer)){

@@ -25,6 +25,8 @@ private:
 
     short bytesToShort(char* bytesArr);
 
+    vector<char> stringToShortBytes(string toConvert);
+
     vector<string> getCommands();
 
 public:
