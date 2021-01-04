@@ -110,7 +110,7 @@ void ConnectionHandler::close() {
     }
 }
 
-bool ConnectionHandler::encode (string keybboardString, char delimiter) {
+bool ConnectionHandler::encode (string &keybboardString, char delimiter) {
     //replace command by opNum
     vector<char> toSend;
     //resolve opcode
@@ -119,7 +119,7 @@ bool ConnectionHandler::encode (string keybboardString, char delimiter) {
     vector<string> allCommands = getCommands();
     short opCode = distance(allCommands.begin(), find(allCommands.begin(), allCommands.end(), commandName));
     shortToBytes(opCode, toSend);
-    //
+    //encode rest of string
     for (char i : restOfString) {
         if (i != delimiter)
             toSend.push_back(i);
@@ -135,7 +135,7 @@ bool ConnectionHandler::encode (string keybboardString, char delimiter) {
     return sendBytes(&delimiter,1);
 }
 
-bool ConnectionHandler::decode(string response, char delimiter) {
+bool ConnectionHandler::decode(string &response, char delimiter) {
     //char to check at each reading
     char bytes[2];
     try {

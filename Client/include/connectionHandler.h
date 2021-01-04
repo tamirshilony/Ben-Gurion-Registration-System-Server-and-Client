@@ -17,9 +17,9 @@ private:
 	tcp::socket socket_;
 
 
-    bool decode (string response, char delimiter);
+    bool decode (string &response, char delimiter);
 
-    bool encode (string keybboardString, char delimiter);
+    bool encode (string &keybboardString, char delimiter);
 
     void shortToBytes(short num, vector<char>& toConvert);
 
