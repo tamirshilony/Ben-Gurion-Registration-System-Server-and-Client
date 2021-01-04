@@ -18,7 +18,7 @@ public class BGURSProtocol implements MessagingProtocol<Message> {
         //pass msg to permission handler and get message
         Message permissionMsg = permissionMessageHandler.handleMessage(msg);
         //if msg ok
-        if(permissionMsg.getType()!=OpcodeType.ACK & permissionMsg.getType()!=OpcodeType.ERR){
+        if(permissionMsg.getType() != OpcodeType.ACK && permissionMsg.getType() != OpcodeType.ERR){
             //pass msg to registration handler
             Message response = registrationMessageHandler.handleMessage(permissionMsg);
             return response;

@@ -30,6 +30,7 @@ public class Database {
 		courseID2Course = new ConcurrentHashMap<>();
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
+		initialize("/home/ofer/Desktop/Studies/SPL/SPL3/Server/src/main/java/bgu/spl/net/impl/stam");
 
 		Vector<Integer> sortedCourses= new Vector<>();
 	}
@@ -40,7 +41,6 @@ public class Database {
 	public static Database getInstance() {
 		return SingletonHolder.instance;
 	}
-	
 	/**
 	 * loades the courses from the file path specified 
 	 * into the Database, returns true if successful.

@@ -34,13 +34,13 @@ public class PermissionMessageHandler extends MessageHandler {
         // get user from dataBase if exist
         User user =db.getUser(msg.getUserName());
         // check valid login condition
-        if(user != null && msg.getPassword() == user.getUserPassword()){
+        if(user != null && msg.getPassword().equals(user.getUserPassword())){
             //update field
             isLoggedin = true;
             userName = msg.getUserName();
             if(db.isAdmin(userName))
                 isAdmin = true;
-            return messageFactory.createMessage(type,type);
+            return messageFactory.createMessage(OpcodeType.ACK,type);
         }
         else {
             return  messageFactory.createMessage(OpcodeType.ERR,type);

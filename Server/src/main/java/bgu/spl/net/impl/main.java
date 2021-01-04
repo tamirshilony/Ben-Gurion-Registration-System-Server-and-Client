@@ -1,8 +1,7 @@
 package bgu.spl.net.impl;
 
 import bgu.spl.net.impl.Messages.Message;
-import bgu.spl.net.srv.Reactor;
-
+import bgu.spl.net.srv.*;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -32,7 +31,7 @@ public class main {
 ////        test login wrong password
 //        Message m4 = messageFactory.createMessage(OpcodeType.LOGIN,"ofer", "wrong password");
 //        Message response3 = protocol.process(m4);
-        Reactor<Message> server = new Reactor<>(3,7777,
+        Reactor<Message> server = new Reactor<>(1,7777,
                 () -> new BGURSProtocol(),() -> new RegistrationMessageEncoderDecoder());
         server.serve();
 

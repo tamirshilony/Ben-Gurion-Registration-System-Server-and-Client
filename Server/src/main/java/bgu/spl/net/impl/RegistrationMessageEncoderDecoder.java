@@ -72,11 +72,15 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
                 String pasword = new String(stringBuffer.toByteArray(), StandardCharsets.UTF_8);
                 decodedPermissionMsg.setPassword(pasword);
                 byteBuffer.clear();
+                type = null;
+                stringBuffer.reset();
                 return decodedPermissionMsg;
             }
             // create the parameter and update
             String username = new String(stringBuffer.toByteArray(),StandardCharsets.UTF_8);
             decodedPermissionMsg.setUserName(username);
+            stringBuffer.reset();
+
         }
         return null;
     }
@@ -93,6 +97,7 @@ public class RegistrationMessageEncoderDecoder implements MessageEncoderDecoder<
             int courseNum = bytesToShort(byteBuffer.array());
             decodedCourseMsg.setCourseNum(courseNum);
             byteBuffer.clear();
+            type = null;
             return decodedCourseMsg;
         }
         return null;
