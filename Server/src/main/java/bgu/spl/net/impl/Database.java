@@ -31,7 +31,6 @@ public class Database {
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
 		initialize("/home/ofer/Desktop/Studies/SPL/SPL3/Server/src/main/java/bgu/spl/net/impl/stam");
-
 		Vector<Integer> sortedCourses= new Vector<>();
 	}
 
