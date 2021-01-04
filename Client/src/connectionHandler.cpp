@@ -132,7 +132,7 @@ bool ConnectionHandler::encode (string &keybboardString, char delimiter) {
     //sendBytes try with pointer to toSend vector
     bool result=sendBytes(&toSend[0],toSend.size());
     if(!result) return false;
-    return sendBytes(&delimiter,1);
+    return result;
 }
 
 bool ConnectionHandler::decode(string &response, char delimiter) {
@@ -163,6 +163,7 @@ bool ConnectionHandler::decode(string &response, char delimiter) {
         return false;
     }return true;
 }
+
 
 
 void ConnectionHandler::shortToBytes(short num, vector<char>& toConvert){
