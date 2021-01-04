@@ -30,7 +30,7 @@ public class Database {
 		courseID2Course = new ConcurrentHashMap<>();
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
-
+		initialize("/home/spl211/stud/SPL/ass3/SPL3/Server/src/main/java/bgu/spl/net/impl/stam");
 		Vector<Integer> sortedCourses= new Vector<>();
 	}
 
