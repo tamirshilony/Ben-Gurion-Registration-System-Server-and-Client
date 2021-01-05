@@ -26,7 +26,7 @@ public class RegistrationMessageHandler extends MessageHandler{
             case MYCOURSES:
                 return studentCourses((OpCodeMessage)msg, userName);
             case STUDENTSTAT:
-                return studentStat((OpCodeMessage)msg);
+                return studentStat((UserNameMessage)msg);
             case COURSESTAT:
                 return courseStat((CourseMessage)msg);
             case ISREGISTERED:
@@ -107,12 +107,12 @@ public class RegistrationMessageHandler extends MessageHandler{
         // get course name
         String courseName = course.getCourseName();
         //string for response
-        String courseNum_Name = "Course:(" + courseNum + ") " + courseName;
+        String courseNum_Name = "Course: (" + courseNum + ") " + courseName;
         // get num of register and limit
         int numOfRegister = course.getNumOfRegistered();
         int limit = course.getLimit();
         //string for response
-        String seatsAvailable = numOfRegister + "/" + limit;
+        String seatsAvailable = "Seats Available: " + numOfRegister + "/" + limit;
         // get user that register to the course
         CopyOnWriteArrayList<User> registerUser = course.getRegisterUsers();
         Vector<String> registerUserNames = new Vector<>();
@@ -122,11 +122,11 @@ public class RegistrationMessageHandler extends MessageHandler{
         // sort name by alfabetic
         Collections.sort(registerUserNames);
         //string for response
-        String registerUserName = registerUserNames.toString();
+        String registerUserName = "Students Registered: " + registerUserNames.toString();
         return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courseNum_Name + "\n" + seatsAvailable + "\n" + registerUserName);
     }
 
-    private Message studentStat(OpCodeMessage msg)
+    private Message studentStat(UserNameMessage msg)
     {
         // get user name
         String name = msg.getUserName();
@@ -139,7 +139,7 @@ public class RegistrationMessageHandler extends MessageHandler{
         // sort by txt.file for tests
         registerCourses = sortCoursesForTest(registerCourses);
         //string for response
-        String registerCourseNum = registerCourses.toString();
+        String registerCourseNum = "Courses: " + registerCourses.toString();
         return  messageFactory.createMessage(OpcodeType.ACK,msg.getType(),userName + "\n" + registerCourseNum);
 
     }

@@ -22,8 +22,9 @@ public class Database {
 	private ConcurrentHashMap<String,User>userName2User;
 	Vector<String> admins;
 
+
 	//for test only
-	private Vector<Integer> sortedCourses;
+	private Vector<Integer> sortedCourses = new Vector<>(); ;
 	//to prevent user from creating new Database
 
 	private Database() {
@@ -31,7 +32,6 @@ public class Database {
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
 		initialize("/home/ofer/Desktop/Studies/SPL/SPL3/Server/src/main/java/bgu/spl/net/impl/stam");
-		Vector<Integer> sortedCourses= new Vector<>();
 	}
 
 	/**
@@ -61,6 +61,7 @@ public class Database {
 					}
 				}
 				Course currCourse = new Course(courseId,courseName,kdamsVec,limit);
+				sortedCourses.add(courseId);
 				courseID2Course.put(courseId,currCourse);
 			}
 		} catch (FileNotFoundException fnfe) {

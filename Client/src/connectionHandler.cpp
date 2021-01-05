@@ -161,7 +161,9 @@ bool ConnectionHandler::decode(string &response, char delimiter) {
         if (!getBytes(bytes, 2))
             return false;
         response.append(" ");
-        response.append(1, bytesToShort(bytes));
+        short num = bytesToShort(bytes);
+        string strNum(to_string(num));
+        response.append(strNum);
         //if ack continue reading
         if (command == "ACK") {
             response.append(" ");

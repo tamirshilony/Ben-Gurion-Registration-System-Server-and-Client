@@ -55,18 +55,6 @@ public class PermissionMessageHandler extends MessageHandler {
                     return registerUser((PermissionMessage)msg);
             }
         }
-//        if(isRegistered()){
-//            if(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG)
-//                return registerUser((PermissionMessage)msg);
-//            else
-//                return messageFactory.createMessage(OpcodeType.ERR,type);
-//        }
-//        else if (!isLoggedin) {
-//            if (type == OpcodeType.LOGIN)
-//                return login((PermissionMessage) msg);
-//            else
-//                return messageFactory.createMessage(OpcodeType.ERR, type);
-//        }
         else if (type == OpcodeType.LOGOUT) {
             userName = null;
             isLoggedin = false;
@@ -77,7 +65,8 @@ public class PermissionMessageHandler extends MessageHandler {
                 (isAdmin & type == OpcodeType.COURSEREG))
             return messageFactory.createMessage(OpcodeType.ERR,type);
         else
-            msg.setUserName(userName);
+            if(msg.getUserName() == null)
+                msg.setUserName(userName);
             return msg;
     }
 
