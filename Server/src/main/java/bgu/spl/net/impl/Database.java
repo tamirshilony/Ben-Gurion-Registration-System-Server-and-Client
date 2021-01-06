@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -20,7 +21,8 @@ public class Database {
 	}
 	private ConcurrentHashMap<Integer,Course>courseID2Course;
 	private ConcurrentHashMap<String,User>userName2User;
-	Vector<String> admins;
+	private CopyOnWriteArrayList<String> loggedUsers;
+	private Vector<String> admins;
 
 
 	//for test only
@@ -31,7 +33,8 @@ public class Database {
 		courseID2Course = new ConcurrentHashMap<>();
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
-		initialize("/home/ofer/Desktop/Studies/SPL/SPL3/Server/src/main/java/bgu/spl/net/impl/stam");
+		loggedUsers = new CopyOnWriteArrayList<>();
+		initialize("/home/ofer/Desktop/Studies/SPL/run_env/Server/Courses.txt");
 	}
 
 	/**
@@ -55,7 +58,7 @@ public class Database {
 				String kdam = info[2].substring(1,info[2].length()-1);
 				String[] kdams = kdam.split(",");
 				Vector<Integer>kdamsVec = new Vector<>();
-				if(kdams.length > 1) {
+				if(!kdam.equals("")) {
 					for (String coursNum : kdams) {
 						kdamsVec.add(Integer.parseInt(coursNum));
 					}
@@ -98,4 +101,7 @@ public class Database {
 		return admins.contains(userName);
 	}
 
+	public CopyOnWriteArrayList<String> getLoggedUsers() {
+		return loggedUsers;
+	}
 }

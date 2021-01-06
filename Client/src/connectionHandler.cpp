@@ -112,7 +112,7 @@ void ConnectionHandler::close() {
 
 bool ConnectionHandler::encode (string &keybboardString, char delimiter) {
     vector<char> toSend;
-    vector<char> editionalDataVal;
+    vector<char> additionalDataVal;
     //resolve opcode
     string commandName = keybboardString.substr(0, keybboardString.find(delimiter));
     string restOfString = keybboardString.substr(keybboardString.find(delimiter) + 1, keybboardString.length());
@@ -128,20 +128,20 @@ bool ConnectionHandler::encode (string &keybboardString, char delimiter) {
     for (char i : restOfString)
     {
         if (i != delimiter)
-            editionalDataVal.push_back(i);
+            additionalDataVal.push_back(i);
         else
-            editionalDataVal.push_back('\0');
+            additionalDataVal.push_back('\0');
     }//deal with courses messages
     if((opCode > 4 && opCode <= 7) || opCode == 9 || opCode == 10){
-        string stringNum(editionalDataVal.begin(), editionalDataVal.end());
-        editionalDataVal = stringToShortBytes(stringNum);
+        string stringNum(additionalDataVal.begin(), additionalDataVal.end());
+        additionalDataVal = stringToShortBytes(stringNum);
     }
     //deal with permission messages
     if ((opCode > 0 && opCode <= 3) || opCode == 8)
-        editionalDataVal.push_back('\0');
+        additionalDataVal.push_back('\0');
 
     //concat parts together and send
-    toSend.insert(toSend.end(),editionalDataVal.begin(),editionalDataVal.end());
+    toSend.insert(toSend.end(),additionalDataVal.begin(),additionalDataVal.end());
     //sendBytes try with pointer to toSend vector
     bool result=sendBytes(&toSend[0],toSend.size());
     if(!result) return false;
@@ -158,6 +158,13 @@ bool ConnectionHandler::decode(string &response, char delimiter) {
         string command = getCommands()[bytesToShort(bytes)];
         response.append(command);
         //get next two bytes convert to short add " " and srcopcode to response
+//        if (command == "ACK") {
+//            while (bytes[1] != '\0'){
+//                if (!getBytes(&bytes[1], 1))
+//                    return false;
+//                response.append(1, bytes[1]);
+//            }
+//        }
         if (!getBytes(bytes, 2))
             return false;
         response.append(" ");
@@ -166,13 +173,14 @@ bool ConnectionHandler::decode(string &response, char delimiter) {
         response.append(strNum);
         //if ack continue reading
         if (command == "ACK") {
-            response.append(" ");
             while (bytes[1] != '\0'){
                 if (!getBytes(&bytes[1], 1))
                     return false;
                 response.append(1, bytes[1]);
             }
         }
+
+
     }catch (exception& e) {
         cerr << "recv failed2 (Error: " << e.what() << ')' << endl;
         return false;
@@ -203,5 +211,5 @@ vector<char> ConnectionHandler::stringToShortBytes(string toConvert) {
 
 vector<string> ConnectionHandler::getCommands() {
     return vector<string>{"NOTEXIST","ADMINREG","STUDENTREG","LOGIN","LOGOUT","COURSEREG","KDAMCHECK",
-                          "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERR"};
+                          "COURSESTAT","STUDENTSTAT","ISREGISTERED","UNREGISTER","MYCOURSES","ACK","ERROR"};
 }

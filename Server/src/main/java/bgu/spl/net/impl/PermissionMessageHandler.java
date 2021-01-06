@@ -4,7 +4,6 @@ import bgu.spl.net.impl.Messages.*;
 
 public class PermissionMessageHandler extends MessageHandler {
     private String userName = null;
-    private boolean isLoggedin = false;
     private boolean isAdmin = false;
 
     public PermissionMessageHandler(){super();}
@@ -12,7 +11,8 @@ public class PermissionMessageHandler extends MessageHandler {
     private Message registerUser(PermissionMessage msg){
         OpcodeType type = msg.getType();
         // check register condition and update field
-        if(db.register(msg.getUserName(),msg.getPassword())== null){
+        boolean success = db.register(msg.getUserName(),msg.getPassword())== null;
+        if(success){
             //checking if admin request and update field
             if(type == OpcodeType.ADMINREG)
                 db.addAdmin(msg.getUserName());
@@ -30,8 +30,8 @@ public class PermissionMessageHandler extends MessageHandler {
         User user =db.getUser(msg.getUserName());
         // check valid login condition
         if(user != null && msg.getPassword().equals(user.getUserPassword())){
-            //update field
-            isLoggedin = true;
+            //update
+            db.getLoggedUsers().add(msg.getUserName());
             userName = msg.getUserName();
             if(db.isAdmin(userName))
                 isAdmin = true;
@@ -44,7 +44,7 @@ public class PermissionMessageHandler extends MessageHandler {
 
     public Message handleMessage(Message msg){
         OpcodeType type = msg.getType();
-        if(!isLoggedin)
+        if(!db.getLoggedUsers().contains(msg.getUserName())&& userName == null)
         {
             if(type != OpcodeType.LOGIN && !(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG))
                 return messageFactory.createMessage(OpcodeType.ERR,type);
@@ -55,30 +55,29 @@ public class PermissionMessageHandler extends MessageHandler {
                     return registerUser((PermissionMessage)msg);
             }
         }
+        else if (type == OpcodeType.LOGIN)
+            return messageFactory.createMessage(OpcodeType.ERR,type);
         else if (type == OpcodeType.LOGOUT) {
+            db.getLoggedUsers().remove(userName);
             userName = null;
-            isLoggedin = false;
             return messageFactory.createMessage(OpcodeType.ACK, type);
         }
         // check admin credentials
         else if((!isAdmin & (type == OpcodeType.COURSESTAT || type == OpcodeType.STUDENTSTAT)) ||
                 (isAdmin & type == OpcodeType.COURSEREG))
             return messageFactory.createMessage(OpcodeType.ERR,type);
-        else
-            if(msg.getUserName() == null)
+        else {
+            if (msg.getUserName() == null)
                 msg.setUserName(userName);
             return msg;
+        }
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
-    }
-
-    public boolean isLoggedin() {
-        return isLoggedin;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
+//    public boolean isAdmin() {
+//        return isAdmin;
+//    }
+//
+//    public String getUserName() {
+//        return userName;
+//    }
 }

@@ -66,10 +66,9 @@ public class RegistrationMessageHandler extends MessageHandler{
     {
         int courseNum = msg.getCourseNum();
         Course course = db.getCourse(courseNum);
-        if (!(course == null))
+        if (course != null)
         {
-            Vector<Integer> kdams = course.getKdams();
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),kdams.toString());
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"\n" + course.getKdams().toString().replaceAll(" ", ""));
         }
         return messageFactory.createMessage(OpcodeType.ERR,msg.getType());
     }
@@ -78,7 +77,7 @@ public class RegistrationMessageHandler extends MessageHandler{
     {
         User user = db.getUser(userName);
         Vector<Integer> courses = user.getRegisteredCourses();
-        return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courses.toString());
+        return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"\n" + courses.toString().replaceAll(" ", ""));
     }
 
     private Message isRegister(CourseMessage msg, String username)
@@ -93,9 +92,9 @@ public class RegistrationMessageHandler extends MessageHandler{
         // check if user register to courseNum
         isRegister = registeredCourses.contains(coursNum);
         if(isRegister)
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"REGISTERED");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"\nREGISTERED");
         else
-            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"NOT REGISTER");
+            return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"\nNOT REGISTERED");
     }
 
     private Message courseStat(CourseMessage msg)
@@ -104,26 +103,29 @@ public class RegistrationMessageHandler extends MessageHandler{
         int courseNum = msg.getCourseNum();
         // get course instance
         Course course = db.getCourse(courseNum);
-        // get course name
-        String courseName = course.getCourseName();
-        //string for response
-        String courseNum_Name = "Course: (" + courseNum + ") " + courseName;
-        // get num of register and limit
-        int numOfRegister = course.getNumOfRegistered();
-        int limit = course.getLimit();
-        //string for response
-        String seatsAvailable = "Seats Available: " + numOfRegister + "/" + limit;
-        // get user that register to the course
-        CopyOnWriteArrayList<User> registerUser = course.getRegisterUsers();
-        Vector<String> registerUserNames = new Vector<>();
-        for (User user:registerUser) {
-            registerUserNames.add(user.getUserUserName());
-        }
-        // sort name by alfabetic
-        Collections.sort(registerUserNames);
-        //string for response
-        String registerUserName = "Students Registered: " + registerUserNames.toString();
-        return messageFactory.createMessage(OpcodeType.ACK,msg.getType(),courseNum_Name + "\n" + seatsAvailable + "\n" + registerUserName);
+        if(course != null) {
+            // get course name
+            String courseName = course.getCourseName();
+            //string for response
+            String courseNum_Name = "Course: (" + courseNum + ") " + courseName;
+            // get num of register and limit
+            int seatsAvailableNum = course.getSeatsAvailable();
+            int limit = course.getLimit();
+            //string for response
+            String seatsAvailable = "Seats Available: " + seatsAvailableNum + "/" + limit;
+            // get user that register to the course
+            CopyOnWriteArrayList<User> registerUser = course.getRegisterUsers();
+            Vector<String> registerUserNames = new Vector<>();
+            for (User user : registerUser) {
+                registerUserNames.add(user.getUserUserName());
+            }
+            // sort name by alfabetic
+            Collections.sort(registerUserNames);
+            //string for response
+            String registerUserName = "Students Registered: " + registerUserNames.toString().replaceAll(" ","");
+            return messageFactory.createMessage(OpcodeType.ACK, msg.getType(), "\n" + courseNum_Name + "\n" + seatsAvailable + "\n" + registerUserName);
+        }else
+            return messageFactory.createMessage(OpcodeType.ERR,msg.getType());
     }
 
     private Message studentStat(UserNameMessage msg)
@@ -139,8 +141,8 @@ public class RegistrationMessageHandler extends MessageHandler{
         // sort by txt.file for tests
         registerCourses = sortCoursesForTest(registerCourses);
         //string for response
-        String registerCourseNum = "Courses: " + registerCourses.toString();
-        return  messageFactory.createMessage(OpcodeType.ACK,msg.getType(),userName + "\n" + registerCourseNum);
+        String registerCourseNum = "Courses: " + registerCourses.toString().replaceAll(" ", "");
+        return  messageFactory.createMessage(OpcodeType.ACK,msg.getType(),"\n"+ userName + "\n" + registerCourseNum);
 
     }
 
@@ -170,11 +172,24 @@ public class RegistrationMessageHandler extends MessageHandler{
     }
 
     private boolean checkCourseLimit(Course course){
-        return (course.getLimit() > course.getNumOfRegistered());
+        return (course.getSeatsAvailable() > 0);
     }
 
     private boolean checkDoubleRegistration(User user,Course course){
         return user.isRegistered(course.getCourseNum());
+    }
+
+
+    public String stringList(Vector<Integer> list){
+        if(list.size() != 0) {
+            String output = "[";
+            for (Integer i : list) {
+                output = output + i + ",";
+            }
+            return output.substring(0, output.length() - 1) + "]";
+        }
+        else
+            return "[]";
     }
 }
 
