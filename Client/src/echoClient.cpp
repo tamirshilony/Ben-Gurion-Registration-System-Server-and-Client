@@ -58,6 +58,10 @@ int main (int argc, char *argv[]) {
             break;
         }
         cout <<  answer <<  endl;
+        std::string logout ("ACK 4");
+        std::string ans (answer);
+        if(ans.compare(logout) == 0)
+            interupted = true;
     }
     if(keyboardReader.isInerupted())
         thread1.detach();

@@ -73,34 +73,6 @@ bool ConnectionHandler::sendLine(std::string& line) {
     return encode(line, ' ');
 }
 
-
-bool ConnectionHandler::getFrameAscii(std::string& frame, char delimiter) {
-    char ch;
-    // Stop when we encounter the null character.
-    // Notice that the null character is not appended to the frame string.
-    try {
-	do{
-		if(!getBytes(&ch, 1))
-		{
-			return false;
-		}
-		if(ch!='\0')
-			frame.append(1, ch);
-	}while (delimiter != ch);
-    } catch (std::exception& e) {
-	std::cerr << "recv failed2 (Error: " << e.what() << ')' << std::endl;
-	return false;
-    }
-    return true;
-}
-
-
-bool ConnectionHandler::sendFrameAscii(const std::string& frame, char delimiter) {
-	bool result=sendBytes(frame.c_str(),frame.length());
-	if(!result) return false;
-	return sendBytes(&delimiter,1);
-}
-
 // Close down the connection properly.
 void ConnectionHandler::close() {
     try{
@@ -158,13 +130,6 @@ bool ConnectionHandler::decode(string &response, char delimiter) {
         string command = getCommands()[bytesToShort(bytes)];
         response.append(command);
         //get next two bytes convert to short add " " and srcopcode to response
-//        if (command == "ACK") {
-//            while (bytes[1] != '\0'){
-//                if (!getBytes(&bytes[1], 1))
-//                    return false;
-//                response.append(1, bytes[1]);
-//            }
-//        }
         if (!getBytes(bytes, 2))
             return false;
         response.append(" ");
