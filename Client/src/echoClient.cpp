@@ -24,15 +24,13 @@ public:
             // convert buf to string
             string command(buf);
             if(!connectionHandler.sendLine(command)){
-                cout<<"fail to send message /n"<<endl;
+                cout<<"connection terminated"<<endl;
                 interupted = true;
             }
         }
     }
 };
-/**
-* This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
-*/
+
 int main (int argc, char *argv[]) {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
@@ -53,11 +51,13 @@ int main (int argc, char *argv[]) {
     while (!interupted) {
         std::string answer;
         if(!connectionHandler.getLine(answer)){
-            cout<<"fail to get message /n"<<endl;
+            cout<<"connection terminated"<<endl;
             interupted = true;
             break;
         }
         cout <<  answer <<  endl;
+        if (answer == "ACK 4")
+            interupted = true;
     }
     if(keyboardReader.isInerupted())
         thread1.detach();

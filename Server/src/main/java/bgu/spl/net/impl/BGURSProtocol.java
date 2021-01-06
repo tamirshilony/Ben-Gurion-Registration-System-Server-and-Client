@@ -16,18 +16,24 @@ public class BGURSProtocol implements MessagingProtocol<Message> {
     @Override
     public Message process(Message msg) {
         //pass msg to permission handler and get message
-        Message permissionMsg = permissionMessageHandler.handleMessage(msg);
+        Message permittedMsg = permissionMessageHandler.handleMessage(msg);
         //if msg ok
-        if(permissionMsg.getType() != OpcodeType.ACK && permissionMsg.getType() != OpcodeType.ERR){
+        if(permittedMsg.getType() != OpcodeType.ACK && permittedMsg.getType() != OpcodeType.ERR){
             //pass msg to registration handler
-            Message response = registrationMessageHandler.handleMessage(permissionMsg);
+            Message response = registrationMessageHandler.handleMessage(permittedMsg);
             return response;
         }
-        return permissionMsg;
+//        if(permittedMsg.getType() == OpcodeType.ACK && msg.getType() == OpcodeType.LOGOUT)
+//            shouldTerminate = true;
+        return permittedMsg;
     }
 
     @Override
     public boolean shouldTerminate() {
         return shouldTerminate;
+    }
+
+    public void setShouldTerminate(boolean shouldTerminate) {
+        this.shouldTerminate = shouldTerminate;
     }
 }

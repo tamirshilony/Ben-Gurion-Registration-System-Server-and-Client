@@ -21,4 +21,5 @@ public class ResponseMessage extends Message{
     public String getOptionalData() {
         return optionalData;
     }
+
 }

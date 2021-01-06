@@ -34,7 +34,7 @@ public class Database {
 		userName2User = new ConcurrentHashMap<>();
 		admins = new Vector<>();
 		loggedUsers = new CopyOnWriteArrayList<>();
-		initialize("/home/ofer/Desktop/Studies/SPL/run_env/Server/Courses.txt");
+		initialize("/home/ofer/Desktop/Studies/SPL/SPL3/Server/Courses.txt");
 	}
 
 	/**

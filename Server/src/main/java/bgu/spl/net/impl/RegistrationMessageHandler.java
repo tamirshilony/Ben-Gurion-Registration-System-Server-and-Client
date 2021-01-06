@@ -1,5 +1,6 @@
 package bgu.spl.net.impl;
 
+import bgu.spl.net.api.MessagingProtocol;
 import bgu.spl.net.impl.Messages.*;
 import java.util.Collections;
 import java.util.Vector;

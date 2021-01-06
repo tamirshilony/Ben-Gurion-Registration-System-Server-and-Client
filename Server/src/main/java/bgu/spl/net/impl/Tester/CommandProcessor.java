@@ -17,7 +17,7 @@ public class CommandProcessor {
 
     public void initialize() {
         try {
-            String binName = "/home/ofer/Desktop/Studies/SPL/run_env/Server/src/main/java/bgu/spl/net/impl/Tester/BGRSclient 127.0.0.1 7777";
+            String binName = "/home/ofer/Desktop/Studies/SPL/SPL3/Server/src/main/java/bgu/spl/net/impl/Tester/BGRSclient 127.0.0.1 7777";
             consoleProcess = Runtime.getRuntime().exec(binName);
             consoleReader = new StreamReader(
                     consoleProcess.getInputStream());
