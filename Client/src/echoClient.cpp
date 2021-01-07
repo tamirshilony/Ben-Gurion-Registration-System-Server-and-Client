@@ -10,12 +10,18 @@ private:
     bool interupted;
     const short bufferSize = 1024;
 
+
 public:
     KeyboardReader(ConnectionHandler & connectionHandler_):connectionHandler(connectionHandler_),interupted(false){};
 
     bool isInerupted(){
         return interupted;
     }
+
+    void setInterupt(bool doInterupt){
+        interupted = doInterupt;
+    }
+
     void run(){
         while (!interupted){
             char buf[bufferSize];
@@ -51,13 +57,13 @@ int main (int argc, char *argv[]) {
     while (!interupted) {
         std::string answer;
         if(!connectionHandler.getLine(answer)){
+            keyboardReader.setInterupt(true);
+            cout <<  answer <<  endl;
             cout<<"connection terminated"<<endl;
             interupted = true;
             break;
         }
         cout <<  answer <<  endl;
-        if (answer == "ACK 4")
-            interupted = true;
     }
     if(keyboardReader.isInerupted())
         thread1.detach();

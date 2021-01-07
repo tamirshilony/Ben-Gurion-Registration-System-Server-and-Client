@@ -63,6 +63,8 @@ public class PermissionMessageHandler extends MessageHandler {
             userName = null;
             return messageFactory.createMessage(OpcodeType.ACK, type);
         }
+        else if(type == OpcodeType.STUDENTREG || type == OpcodeType.ADMINREG)
+            return messageFactory.createMessage(OpcodeType.ERR,type);
         // check admin credentials
         else if((!isAdmin & (type == OpcodeType.COURSESTAT || type == OpcodeType.STUDENTSTAT)) ||
                 (isAdmin & type == OpcodeType.COURSEREG))
